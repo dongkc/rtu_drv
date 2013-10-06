@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="2.3.2">
+ <framework name="qpcpp"/>
+ <package name="AOs" stereotype="0x02">
+  <class name="ModbusMgr" superclass="qpcpp::QActive">
+   <attribute name="ctx" type="modbus_t*" visibility="0x02" properties="0x00"/>
+   <attribute name="_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <attribute name="_tab_bits[8]" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <attribute name="_table_registers[10]" type="uint16_t" visibility="0x02" properties="0x00"/>
+   <operation name="ModbusMgr" type="QActive(Q_STATE_CAST(&amp;ModbusMgr::initial)), _timeEvt(TIME_OUT_SIG)" visibility="0x00" properties="0x00">
+    <parameter name="port" type="const char*"/>
+    <parameter name="baud" type="int32_t"/>
+    <parameter name="parity" type="char"/>
+    <parameter name="data_bit" type="int32_t"/>
+    <parameter name="stop_bit" type="int32_t"/>
+    <code>for (int i = 0; i &lt; 8; ++i) {
+    _tab_bits[i] = 0;
+}
+
+for (int i = 0; i &lt; 8; ++i) {
+    _table_registers[i] = 0;
+}
+
+ctx = modbus_new_rtu(port, baud, parity, data_bit, stop_bit);
+</code>
+   </operation>
+   <statechart>
+    <initial target="../1">
+     <action>QS_OBJ_DICTIONARY(&amp;modbusMgr);
+QS_OBJ_DICTIONARY(&amp;modbusMgr._timeEvt);
+QS_FUN_DICTIONARY(&amp;ModbusMgr::initial);
+QS_FUN_DICTIONARY(&amp;ModbusMgr::running);
+QS_SIG_DICTIONARY(TIME_OUT_SIG, me);
+
+modbus_rtu_set_serial_mode(me-&gt;ctx, MODBUS_RTU_RS485);
+modbus_rtu_set_rts(me-&gt;ctx, MODBUS_RTU_RTS_DOWN);
+
+modbus_set_debug(me-&gt;ctx, TRUE);
+
+if (modbus_connect(me-&gt;ctx) == -1) {
+//TODO
+}
+
+modbus_set_slave(me-&gt;ctx, 0x02);
+
+
+me-&gt;subscribe(TIME_OUT_SIG);</action>
+     <initial_glyph conn="27,7,5,0,23,10">
+      <action box="0,-2,22,2"/>
+     </initial_glyph>
+    </initial>
+    <state name="running">
+     <entry>me-&gt;_timeEvt.postEvery(me, Zebra::BSP_TICKS_PER_SEC/100 );</entry>
+     <exit>me-&gt;_timeEvt.disarm();</exit>
+     <tran trig="TIME_OUT">
+      <action>int rc = modbus_read_input_bits(me-&gt;ctx, 0, 8, me-&gt;_tab_bits);
+if (rc != 8) {
+    std::cout &lt;&lt; &quot;FAILED, number of points = &quot; &lt;&lt; rc &lt;&lt; std::endl;
+}
+
+/*
+uint8_t tab_value[8] = {1, 0, 1, 0, 1, 0, 1, 0};
+rc = modbus_write_bits(me-&gt;ctx, 0, 8, tab_value);
+if (rc != 8) {
+    std::cout &lt;&lt; &quot;FAILED, number of bits = &quot; &lt;&lt; rc &lt;&lt; std::endl;
+}
+
+rc = modbus_read_input_registers(me-&gt;ctx, 0, 8, me-&gt;_table_registers);
+if (rc != 8) {
+    std::cout &lt;&lt; &quot;FAILED, number of registers = &quot; &lt;&lt; rc &lt;&lt; std::endl;
+}
+
+*/</action>
+      <tran_glyph conn="34,31,3,-1,24">
+       <action box="0,-2,12,3"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="34,17,31,31">
+      <entry box="1,2,5,2"/>
+      <exit box="1,4,5,2"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="153,53"/>
+   </statechart>
+  </class>
+ </package>
+ <directory name=".">
+  <file name="app.h">
+   <text>#ifndef APP_HEADER
+#define APP_HEADER
+
+#include &quot;qp_port.h&quot;
+
+
+namespace Zebra {
+
+
+enum Signals {
+    TIME_OUT_SIG = QP::Q_USER_SIG,
+    MAX_PUBLISH_SIG,
+};
+
+
+}  // namespace Zebra
+
+#endif  // APP_HEADER</text>
+  </file>
+  <file name="modbus-mgr.cpp">
+   <text>#include &lt;iostream&gt;
+
+#include &quot;modbus.h&quot;
+#include &quot;modbus-mgr.h&quot;
+
+using namespace std;
+
+namespace Zebra {
+
+
+static ModbusMgr modbusMgr(&quot;/dev/ttyS1&quot;, 115200, 'N', 8, 1);
+QP::QActive * const AO_Modbus = &amp;modbusMgr;
+
+#ifdef     Q_SPY
+enum ModbusRecords {
+    MODBUS_INIT_CODE = QP::QS_USER,
+    MODBUS_ENABLE_CODE
+};
+#endif
+
+$define(AOs::ModbusMgr)
+
+
+}  // namespace Zebra</text>
+  </file>
+  <file name="modbus-mgr.h">
+   <text>#ifndef MODBUS_MGR_H
+#define MODBUS_MGR_H
+
+#include &quot;app.h&quot;
+#include &quot;qp_port.h&quot;
+#include &quot;bsp.h&quot;
+#include &quot;modbus.h&quot;
+#include &quot;dpp.h&quot;
+
+namespace Zebra {
+
+
+$declare(AOs::ModbusMgr)
+
+
+} // namespace Zebra
+
+#endif  // MODBUS_MGR_H</text>
+  </file>
+ </directory>
+</model>

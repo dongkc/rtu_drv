@@ -1,0 +1,96 @@
+﻿Build started 2/10/2013 7:24:14 PM.
+     1>Project "D:\qp\qpcpp\ports\win32\vc\qp.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\qp.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I. /I../../../include /I../../../qep/source /I../../../qf/source /I../../../qs/source /Zi /nologo /W4 /WX- /Od /Oy- /D WIN32 /D _DEBUG /Gm- /MT /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /wd4127 /analyze- /errorReport:prompt ..\..\..\qep\source\qep.cpp ..\..\..\qep\source\qfsm_dis.cpp ..\..\..\qep\source\qfsm_ini.cpp ..\..\..\qep\source\qhsm_dis.cpp ..\..\..\qep\source\qhsm_in.cpp ..\..\..\qep\source\qhsm_ini.cpp ..\..\..\qep\source\qhsm_top.cpp ..\..\..\qf\source\qa_defer.cpp ..\..\..\qf\source\qa_fifo.cpp ..\..\..\qf\source\qa_get_.cpp ..\..\..\qf\source\qa_lifo.cpp ..\..\..\qf\source\qa_sub.cpp ..\..\..\qf\source\qa_usub.cpp ..\..\..\qf\source\qa_usuba.cpp ..\..\..\qf\source\qeq_fifo.cpp ..\..\..\qf\source\qeq_get.cpp ..\..\..\qf\source\qeq_init.cpp ..\..\..\qf\source\qeq_lifo.cpp ..\..\..\qf\source\qf_act.cpp ..\..\..\qf\source\qf_gc.cpp ..\..\..\qf\source\qf_log2.cpp ..\..\..\qf\source\qf_new.cpp ..\..\..\qf\source\qf_pool.cpp ..\..\..\qf\source\qf_psini.cpp ..\..\..\qf\source\qf_pspub.cpp ..\..\..\qf\source\qf_pwr2.cpp ..\..\..\qf\source\qf_tick.cpp ..\..\..\qf\source\qmp_get.cpp ..\..\..\qf\source\qmp_init.cpp ..\..\..\qf\source\qmp_put.cpp ..\..\..\qf\source\qte_arm.cpp ..\..\..\qf\source\qte_ctor.cpp ..\..\..\qf\source\qte_ctr.cpp ..\..\..\qf\source\qte_darm.cpp ..\..\..\qf\source\qte_rarm.cpp qf_port.cpp win32_gui.cpp
+         qep.cpp
+         qfsm_dis.cpp
+         qfsm_ini.cpp
+         qhsm_dis.cpp
+         qhsm_in.cpp
+         qhsm_ini.cpp
+         qhsm_top.cpp
+         qa_defer.cpp
+         qa_fifo.cpp
+         qa_get_.cpp
+         qa_lifo.cpp
+         qa_sub.cpp
+         qa_usub.cpp
+         qa_usuba.cpp
+         qeq_fifo.cpp
+         qeq_get.cpp
+         qeq_init.cpp
+         qeq_lifo.cpp
+         qf_act.cpp
+         qf_gc.cpp
+         Generating Code...
+         Compiling...
+         qf_log2.cpp
+         qf_new.cpp
+         qf_pool.cpp
+         qf_psini.cpp
+         qf_pspub.cpp
+         qf_pwr2.cpp
+         qf_tick.cpp
+         qmp_get.cpp
+         qmp_init.cpp
+         qmp_put.cpp
+         qte_arm.cpp
+         qte_ctor.cpp
+         qte_ctr.cpp
+         qte_darm.cpp
+         qte_rarm.cpp
+         qf_port.cpp
+         win32_gui.cpp
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"D:\qp\qpcpp\ports\win32\vc\Debug\qp.lib" /NOLOGO Debug\qep.obj
+         Debug\qfsm_dis.obj
+         Debug\qfsm_ini.obj
+         Debug\qhsm_dis.obj
+         Debug\qhsm_in.obj
+         Debug\qhsm_ini.obj
+         Debug\qhsm_top.obj
+         Debug\qa_defer.obj
+         Debug\qa_fifo.obj
+         Debug\qa_get_.obj
+         Debug\qa_lifo.obj
+         Debug\qa_sub.obj
+         Debug\qa_usub.obj
+         Debug\qa_usuba.obj
+         Debug\qeq_fifo.obj
+         Debug\qeq_get.obj
+         Debug\qeq_init.obj
+         Debug\qeq_lifo.obj
+         Debug\qf_act.obj
+         Debug\qf_gc.obj
+         Debug\qf_log2.obj
+         Debug\qf_new.obj
+         Debug\qf_pool.obj
+         Debug\qf_psini.obj
+         Debug\qf_pspub.obj
+         Debug\qf_pwr2.obj
+         Debug\qf_tick.obj
+         Debug\qmp_get.obj
+         Debug\qmp_init.obj
+         Debug\qmp_put.obj
+         Debug\qte_arm.obj
+         Debug\qte_ctor.obj
+         Debug\qte_ctr.obj
+         Debug\qte_darm.obj
+         Debug\qte_rarm.obj
+         Debug\qf_port.obj
+         Debug\win32_gui.obj
+         qp.vcxproj -> D:\qp\qpcpp\ports\win32\vc\Debug\qp.lib
+       PostBuildEvent:
+         Description: Cleanup
+         del Debug\*.obj Debug\*.tlog Debug\*.lastbuildstate
+         :VCEnd
+       FinalizeBuildStatus:
+         Deleting file "Debug\qp.unsuccessfulbuild".
+     1>Done Building Project "D:\qp\qpcpp\ports\win32\vc\qp.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:05.85
