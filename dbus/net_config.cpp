@@ -44,7 +44,7 @@ class Manager : public net::connman::Manager_proxy,
         }
 };
 
-//DBus::BusDispatcher dispatcher;
+DBus::BusDispatcher dispatcher;
 
 template <typename T>
 ::DBus::Variant make_variant(T str)
@@ -161,27 +161,5 @@ int getIP(std::map<std::string, std::string>& ipv4)
     string gateway = ipv4_property["Gateway"];
     ipv4["Gateway"] = gateway;
 
-    return 0;
-}
-
-int main(int argc, const char *argv[])
-{
-    
-    map<string, string> ipv4;
-    getIP(ipv4);
-
-    cout << ipv4["Method"] << endl;
-    cout << ipv4["Address"] << endl;
-    cout << ipv4["Netmask"] << endl;
-    cout << ipv4["Gateway"] << endl;
-
-    vector<string> dns;
-    //dns.push_back("10.1.23.45");
-    //dns.push_back("10.1.23.46");
-
-    getDNS(dns);
-
-    cout << dns[0] << endl;
-    cout << dns[1] << endl;
     return 0;
 }

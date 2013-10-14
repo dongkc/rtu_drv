@@ -1,0 +1,65 @@
+<%!
+    #include "Poco/Util/ServerApplication.h"
+
+
+    using Poco::Util::ServerApplication;
+    using Poco::Util::Application;
+    using Poco::Net::NameValueCollection;
+%>
+<%
+
+		Application& app = Application::instance();
+		app.logger().information("URI: " + request.getURI());
+%>
+<html>
+<head>
+<title>系统配置</title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<meta content="Comsenz Inc." name="Copyright" />
+</head>
+<body>
+<div class="container">
+    <div class="row-fluid">
+        <div class="well span9">
+            <H3>网络参数配置</H3>
+            <FORM id="formNet" method="post"  action="/goform/NetConfig">
+                <TABLE class="msgtable" balign="center" order="0" cellSpacing="0">
+                    <TBODY>
+                    <TR>
+                        <TD align="right">设备网络IP地址:</TD>
+                        <TD><input name="ip" type="text" id="ip" value="192.168.0.88" maxlength="15" /></TD></TR>
+                    <TR>
+                        <TD align="right">设备网络掩码:</TD>
+                        <TD><input name="mask" type="text" id="mask" value="255.255.255.0" maxlength="15" /></TD></TR>
+                    <TR>
+                        <TD align="right">设备网络网关:</TD>
+                        <TD><input name="gateway" type="text" id="gateway" value="192.168.0.1" maxlength="15" /></TD></TR>
+                    <TR>
+                        <TD align="right">设备主DNS服务器地址:</TD>
+                        <TD><input name="dnss1" type="text" id="dnss1" value="0.0.0.0" maxlength="15" /></TD></TR>
+                    <TR>
+                        <TD align="right">设备备DNS服务器地址:</TD>
+                        <TD><input name="dnss2" type="text" id="dnss2" value="0.0.0.0" maxlength="15" /></TD></TR>
+                    <TR>
+                        <TD align="right"><INPUT class="btn" name="Submit" value="应用网络设置" type="submit"><INPUT class="btn" name="Submit2" value="重置" type="reset"></TD></TR></TBODY></TABLE></FORM>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+<%
+		NameValueCollection::ConstIterator it = request.begin();
+		NameValueCollection::ConstIterator end = request.end();
+		if (!form.empty())
+		{
+			it = form.begin();
+			end = form.end();
+			for (; it != end; ++it)
+			{
+                app.logger().information(it->first + " : " + it->second);
+			}
+		}
+		
+%>

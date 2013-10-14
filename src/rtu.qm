@@ -35,7 +35,7 @@ QS_SIG_DICTIONARY(TIME_OUT_SIG, me);
 modbus_rtu_set_serial_mode(me-&gt;ctx, MODBUS_RTU_RS485);
 modbus_rtu_set_rts(me-&gt;ctx, MODBUS_RTU_RTS_DOWN);
 
-modbus_set_debug(me-&gt;ctx, TRUE);
+//modbus_set_debug(me-&gt;ctx, TRUE);
 
 if (modbus_connect(me-&gt;ctx) == -1) {
 //TODO
@@ -50,7 +50,7 @@ me-&gt;subscribe(TIME_OUT_SIG);</action>
      </initial_glyph>
     </initial>
     <state name="running">
-     <entry>me-&gt;_timeEvt.postEvery(me, Zebra::BSP_TICKS_PER_SEC/100 );</entry>
+     <entry>me-&gt;_timeEvt.postEvery(me, Zebra::BSP_TICKS_PER_SEC * 100 );</entry>
      <exit>me-&gt;_timeEvt.disarm();</exit>
      <tran trig="TIME_OUT">
       <action>int rc = modbus_read_input_bits(me-&gt;ctx, 0, 8, me-&gt;_tab_bits);

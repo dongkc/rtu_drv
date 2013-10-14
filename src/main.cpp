@@ -1,37 +1,91 @@
-#include "qp_port.h"
-#include "dpp.h"
-#include "bsp.h"
+#include <Poco/Util/ServerApplication.h>
+#include <Poco/Util/Option.h>
+#include <Poco/Util/OptionSet.h>
+#include <Poco/Util/HelpFormatter.h>
+#include <iostream>
 
-namespace Zebra {
-
-// Local-scope objects -------------------------------------------------------
-static QP::QEvt const *modbusQueue[50000];
-static QP::QSubscrList l_subscrSto[MAX_PUB_SIG];
-
-// storage for event pools...
-static QF_MPOOL_EL(TableEvt) l_smlPoolSto[100];            // small pool
-
-//............................................................................
-extern "C" int main(int argc, char *argv[]) {
-
-    QP::QF::init();
-
-    BSP_init();
-
-    QS_OBJ_DICTIONARY(l_smlPoolSto);
-    QS_OBJ_DICTIONARY(modbusQueue);
-
-    QP::QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));
-
-    QP::QF::poolInit(l_smlPoolSto,
-                     sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
+#include "ActivityQP.h"
+#include "http.h"
 
 
-    AO_Modbus->start((uint8_t)(1),
-                    modbusQueue, Q_DIM(modbusQueue),
-                    (void *)0, 1024, (QP::QEvt *)0);
+using Poco::Util::ServerApplication;
+using Poco::Util::Application;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::HelpFormatter;
 
-    return QP::QF::run();
+
+class RTUServer: public Poco::Util::ServerApplication
+{
+public:
+	RTUServer(): _helpRequested(false)
+	{
+        addSubsystem(new Http);
+	}
+
+	~RTUServer()
+	{
+	}
+
+protected:
+	void initialize(Application& self)
+	{
+		loadConfiguration(); // load default configuration files, if present
+		ServerApplication::initialize(self);
+	}
+
+	void uninitialize()
+	{
+		ServerApplication::uninitialize();
+	}
+
+	void defineOptions(OptionSet& options)
+	{
+		ServerApplication::defineOptions(options);
+		
+		options.addOption(
+			Option("help", "h", "display help information on command line arguments")
+				.required(false)
+				.repeatable(false));
+	}
+
+	void handleOption(const std::string& name, const std::string& value)
+	{
+		ServerApplication::handleOption(name, value);
+
+		if (name == "help")
+			_helpRequested = true;
+	}
+
+	void displayHelp()
+	{
+		HelpFormatter helpFormatter(options());
+		helpFormatter.setCommand(commandName());
+		helpFormatter.setUsage("OPTIONS");
+		helpFormatter.setHeader("A web server that shows how to work with HTML forms.");
+		helpFormatter.format(std::cout);
+	}
+
+	int main(const std::vector<std::string>& args)
+	{
+		if (_helpRequested)
+		{
+			displayHelp();
+		} else {
+            ActivityQP qp;
+            qp.start();
+            while(true);
+        }
+		return Application::EXIT_OK;
+	}
+
+private:
+	bool _helpRequested;
+};
+
+
+int main(int argc, char** argv)
+{
+	RTUServer app;
+	return app.run(argc, argv);
 }
-
-}  // namespace Zebra

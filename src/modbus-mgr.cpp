@@ -71,7 +71,7 @@ QP::QState ModbusMgr::initial(ModbusMgr * const me, QP::QEvt const * const e) {
     modbus_rtu_set_serial_mode(me->ctx, MODBUS_RTU_RS485);
     modbus_rtu_set_rts(me->ctx, MODBUS_RTU_RTS_DOWN);
 
-    modbus_set_debug(me->ctx, TRUE);
+    //modbus_set_debug(me->ctx, TRUE);
 
     if (modbus_connect(me->ctx) == -1) {
     //TODO
@@ -89,7 +89,7 @@ QP::QState ModbusMgr::running(ModbusMgr * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // @(/1/0/5/1)
         case Q_ENTRY_SIG: {
-            me->_timeEvt.postEvery(me, Zebra::BSP_TICKS_PER_SEC/100 );
+            me->_timeEvt.postEvery(me, Zebra::BSP_TICKS_PER_SEC * 100);
             status_ = Q_HANDLED();
             break;
         }
