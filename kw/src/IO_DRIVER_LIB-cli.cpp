@@ -1,0 +1,970 @@
+// KW-Software eCLR Native Library Builder version 2.1.2.0
+// IO_DRIVER_LIB firmware module setup code. created at Tue Jul 16 14:19:16 2013
+
+// do not modify this automatically generated file !
+
+#include "eclr.h"
+#include "controller.h"
+#include "metadata.h"
+
+#include "IO_DRIVER_LIB.h"
+
+#if ECLRMETA_COMPATID != 10
+  #error incompatible metadata, rebuild IO_DRIVER_LIB.cs !
+#endif
+
+typedef uint32 t_meta;
+
+extern t_meta IO_DRIVER_LIB_meta[];
+
+// declare all method member
+void (IO_DRIVER_LIB::KWIODriver::* const p41)() = &IO_DRIVER_LIB::KWIODriver::ctor;
+void (IO_DRIVER_LIB::KWIODriver::* const p45)(SZArray*, SZArray*) = &IO_DRIVER_LIB::KWIODriver::Init;
+void (IO_DRIVER_LIB::KWIODriver::* const p50)() = &IO_DRIVER_LIB::KWIODriver::Open;
+void (IO_DRIVER_LIB::KWIODriver::* const p54)() = &IO_DRIVER_LIB::KWIODriver::Close;
+void (IO_DRIVER_LIB::KWIODriver::* const p58)() = &IO_DRIVER_LIB::KWIODriver::BeginReadAll;
+void (IO_DRIVER_LIB::KWIODriver::* const p64)(Int32) = &IO_DRIVER_LIB::KWIODriver::BeginReadGroup;
+SByte (IO_DRIVER_LIB::KWIODriver::* const p71)(Int32) = &IO_DRIVER_LIB::KWIODriver::ReadSByte;
+Int16 (IO_DRIVER_LIB::KWIODriver::* const p77)(Int32) = &IO_DRIVER_LIB::KWIODriver::ReadInt16;
+Int32 (IO_DRIVER_LIB::KWIODriver::* const p83)(Int32) = &IO_DRIVER_LIB::KWIODriver::ReadInt32;
+Byte (IO_DRIVER_LIB::KWIODriver::* const p89)(Int32) = &IO_DRIVER_LIB::KWIODriver::ReadByte;
+UInt16 (IO_DRIVER_LIB::KWIODriver::* const p95)(Int32) = &IO_DRIVER_LIB::KWIODriver::ReadUInt16;
+UInt32 (IO_DRIVER_LIB::KWIODriver::* const p101)(Int32) = &IO_DRIVER_LIB::KWIODriver::ReadUInt32;
+UInt32 (IO_DRIVER_LIB::KWIODriver::* const p107)(Int32) = &IO_DRIVER_LIB::KWIODriver::ReadSingle;
+UInt64 (IO_DRIVER_LIB::KWIODriver::* const p113)(Int32) = &IO_DRIVER_LIB::KWIODriver::ReadDouble;
+void (IO_DRIVER_LIB::KWIODriver::* const p119)(Int32, Byte*, Int32) = &IO_DRIVER_LIB::KWIODriver::ReadByteBuffer;
+void (IO_DRIVER_LIB::KWIODriver::* const p127)() = &IO_DRIVER_LIB::KWIODriver::EndReadGroup;
+void (IO_DRIVER_LIB::KWIODriver::* const p133)() = &IO_DRIVER_LIB::KWIODriver::EndReadAll;
+void (IO_DRIVER_LIB::KWIODriver::* const p138)() = &IO_DRIVER_LIB::KWIODriver::BeginWriteAll;
+void (IO_DRIVER_LIB::KWIODriver::* const p144)(Int32) = &IO_DRIVER_LIB::KWIODriver::BeginWriteGroup;
+void (IO_DRIVER_LIB::KWIODriver::* const p151)(Int32, SByte) = &IO_DRIVER_LIB::KWIODriver::WriteSByte;
+void (IO_DRIVER_LIB::KWIODriver::* const p157)(Int32, Int16) = &IO_DRIVER_LIB::KWIODriver::WriteInt16;
+void (IO_DRIVER_LIB::KWIODriver::* const p163)(Int32, Int32) = &IO_DRIVER_LIB::KWIODriver::WriteInt32;
+void (IO_DRIVER_LIB::KWIODriver::* const p169)(Int32, Byte) = &IO_DRIVER_LIB::KWIODriver::WriteByte;
+void (IO_DRIVER_LIB::KWIODriver::* const p175)(Int32, UInt16) = &IO_DRIVER_LIB::KWIODriver::WriteUInt16;
+void (IO_DRIVER_LIB::KWIODriver::* const p181)(Int32, UInt32) = &IO_DRIVER_LIB::KWIODriver::WriteUInt32;
+void (IO_DRIVER_LIB::KWIODriver::* const p187)(Int32, UInt32) = &IO_DRIVER_LIB::KWIODriver::WriteSingle;
+void (IO_DRIVER_LIB::KWIODriver::* const p193)(Int32, UInt64) = &IO_DRIVER_LIB::KWIODriver::WriteDouble;
+void (IO_DRIVER_LIB::KWIODriver::* const p199)(Int32, Byte*, Int32) = &IO_DRIVER_LIB::KWIODriver::WriteByteBuffer;
+void (IO_DRIVER_LIB::KWIODriver::* const p207)() = &IO_DRIVER_LIB::KWIODriver::EndWriteGroup;
+void (IO_DRIVER_LIB::KWIODriver::* const p213)() = &IO_DRIVER_LIB::KWIODriver::EndWriteAll;
+
+unsigned IO_DRIVER_LIB::s_modulHndl;
+bool IO_DRIVER_LIB::loadLibrary()
+{
+    ClrMethod* pMethod = NULL;
+    pMethod = pMethod;
+    // class IO_DRIVER_LIB.KWIODriver
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[41];
+    pMethod->setEntry(get_class_method((void*)&p41));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[45];
+    pMethod->setEntry(get_class_method((void*)&p45));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[50];
+    pMethod->setEntry(get_class_method((void*)&p50));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[54];
+    pMethod->setEntry(get_class_method((void*)&p54));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[58];
+    pMethod->setEntry(get_class_method((void*)&p58));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[64];
+    pMethod->setEntry(get_class_method((void*)&p64));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[71];
+    pMethod->setEntry(get_class_method((void*)&p71));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[77];
+    pMethod->setEntry(get_class_method((void*)&p77));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[83];
+    pMethod->setEntry(get_class_method((void*)&p83));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[89];
+    pMethod->setEntry(get_class_method((void*)&p89));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[95];
+    pMethod->setEntry(get_class_method((void*)&p95));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[101];
+    pMethod->setEntry(get_class_method((void*)&p101));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[107];
+    pMethod->setEntry(get_class_method((void*)&p107));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[113];
+    pMethod->setEntry(get_class_method((void*)&p113));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[119];
+    pMethod->setEntry(get_class_method((void*)&p119));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[127];
+    pMethod->setEntry(get_class_method((void*)&p127));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[133];
+    pMethod->setEntry(get_class_method((void*)&p133));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[138];
+    pMethod->setEntry(get_class_method((void*)&p138));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[144];
+    pMethod->setEntry(get_class_method((void*)&p144));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[151];
+    pMethod->setEntry(get_class_method((void*)&p151));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[157];
+    pMethod->setEntry(get_class_method((void*)&p157));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[163];
+    pMethod->setEntry(get_class_method((void*)&p163));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[169];
+    pMethod->setEntry(get_class_method((void*)&p169));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[175];
+    pMethod->setEntry(get_class_method((void*)&p175));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[181];
+    pMethod->setEntry(get_class_method((void*)&p181));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[187];
+    pMethod->setEntry(get_class_method((void*)&p187));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[193];
+    pMethod->setEntry(get_class_method((void*)&p193));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[199];
+    pMethod->setEntry(get_class_method((void*)&p199));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[207];
+    pMethod->setEntry(get_class_method((void*)&p207));
+    pMethod = (ClrMethod*)&IO_DRIVER_LIB_meta[213];
+    pMethod->setEntry(get_class_method((void*)&p213));
+    unsigned size = 282*4;
+    s_modulHndl = ClrController::addNativeLib(IO_DRIVER_LIB_meta, size, isCompatible, load, unload);
+    return true;
+
+}
+
+#if (PLATFORM_TARGET_ENDIANESS == TARGET_BIG_ENDIAN)
+#define META_0000 0x00000110
+#define META_0001 0x00000A04
+#define META_0002 0x00000811
+#define META_0003 0x00010001
+#define META_0004 0x00000000
+#define META_0005 0x00000002
+#define META_0006 0x00000010
+#define META_0007 0x494F5F44
+#define META_0008 0x52495645
+#define META_0009 0x525F4C49
+#define META_0010 0x42000000
+#define META_0011 0x00000412
+#define META_0012 0x494F5F44
+#define META_0013 0x52495645
+#define META_0014 0x525F4C49
+#define META_0015 0x42000000
+#define META_0016 0x0000C913
+#define META_0017 0x00000000
+#define META_0018 0x00000000
+#define META_0019 0x82100720
+#define META_0020 0x0000001E
+#define META_0021 0x00000004
+#define META_0022 0x00DBFFF9
+#define META_0023 0x0024002B
+#define META_0024 0x0034003B
+#define META_0025 0x0042004D
+#define META_0026 0x005A0065
+#define META_0027 0x0070007B
+#define META_0028 0x00860091
+#define META_0029 0x009C00A7
+#define META_0030 0x00B200C1
+#define META_0031 0x00CC00D5
+#define META_0032 0x00E000ED
+#define META_0033 0x00F80103
+#define META_0034 0x010E0119
+#define META_0035 0x0124012F
+#define META_0036 0x013A0145
+#define META_0037 0x0154015F
+#define META_0038 0x4B57494F
+#define META_0039 0x44726976
+#define META_0040 0x65720000
+#define META_0041 0x00000000
+#define META_0042 0x00050000
+#define META_0043 0x2E63746F
+#define META_0044 0x72000000
+#define META_0045 0x00000000
+#define META_0046 0x00010002
+#define META_0047 0x00B000B0
+#define META_0048 0x496E6974
+#define META_0049 0x00000000
+#define META_0050 0x00000000
+#define META_0051 0x00010000
+#define META_0052 0x4F70656E
+#define META_0053 0x00000000
+#define META_0054 0x00000000
+#define META_0055 0x00010000
+#define META_0056 0x436C6F73
+#define META_0057 0x65000000
+#define META_0058 0x00000000
+#define META_0059 0x00010000
+#define META_0060 0x42656769
+#define META_0061 0x6E526561
+#define META_0062 0x64416C6C
+#define META_0063 0x00000000
+#define META_0064 0x00000000
+#define META_0065 0x00010001
+#define META_0066 0x00BA4265
+#define META_0067 0x67696E52
+#define META_0068 0x65616447
+#define META_0069 0x726F7570
+#define META_0070 0x00000000
+#define META_0071 0x00000000
+#define META_0072 0x00110002
+#define META_0073 0x00B700B3
+#define META_0074 0x52656164
+#define META_0075 0x53427974
+#define META_0076 0x65000000
+#define META_0077 0x00000000
+#define META_0078 0x00110002
+#define META_0079 0x00B500AD
+#define META_0080 0x52656164
+#define META_0081 0x496E7431
+#define META_0082 0x36000000
+#define META_0083 0x00000000
+#define META_0084 0x00110002
+#define META_0085 0x00A700A7
+#define META_0086 0x52656164
+#define META_0087 0x496E7433
+#define META_0088 0x32000000
+#define META_0089 0x00000000
+#define META_0090 0x00110002
+#define META_0091 0x00AD00A1
+#define META_0092 0x52656164
+#define META_0093 0x42797465
+#define META_0094 0x00000000
+#define META_0095 0x00000000
+#define META_0096 0x00110002
+#define META_0097 0x00AB009B
+#define META_0098 0x52656164
+#define META_0099 0x55496E74
+#define META_0100 0x31360000
+#define META_0101 0x00000000
+#define META_0102 0x00110002
+#define META_0103 0x00A90095
+#define META_0104 0x52656164
+#define META_0105 0x55496E74
+#define META_0106 0x33320000
+#define META_0107 0x00000000
+#define META_0108 0x00110002
+#define META_0109 0x00A7008F
+#define META_0110 0x52656164
+#define META_0111 0x53696E67
+#define META_0112 0x6C650000
+#define META_0113 0x00000000
+#define META_0114 0x00110002
+#define META_0115 0x00A50089
+#define META_0116 0x52656164
+#define META_0117 0x446F7562
+#define META_0118 0x6C650000
+#define META_0119 0x00000000
+#define META_0120 0x00010003
+#define META_0121 0x0083006E
+#define META_0122 0x00835265
+#define META_0123 0x61644279
+#define META_0124 0x74654275
+#define META_0125 0x66666572
+#define META_0126 0x00000000
+#define META_0127 0x00000000
+#define META_0128 0x00010000
+#define META_0129 0x456E6452
+#define META_0130 0x65616447
+#define META_0131 0x726F7570
+#define META_0132 0x00000000
+#define META_0133 0x00000000
+#define META_0134 0x00010000
+#define META_0135 0x456E6452
+#define META_0136 0x65616441
+#define META_0137 0x6C6C0000
+#define META_0138 0x00000000
+#define META_0139 0x00010000
+#define META_0140 0x42656769
+#define META_0141 0x6E577269
+#define META_0142 0x7465416C
+#define META_0143 0x6C000000
+#define META_0144 0x00000000
+#define META_0145 0x00010001
+#define META_0146 0x006A4265
+#define META_0147 0x67696E57
+#define META_0148 0x72697465
+#define META_0149 0x47726F75
+#define META_0150 0x70000000
+#define META_0151 0x00000000
+#define META_0152 0x00010002
+#define META_0153 0x00630067
+#define META_0154 0x57726974
+#define META_0155 0x65534279
+#define META_0156 0x74650000
+#define META_0157 0x00000000
+#define META_0158 0x00010002
+#define META_0159 0x005D0065
+#define META_0160 0x57726974
+#define META_0161 0x65496E74
+#define META_0162 0x31360000
+#define META_0163 0x00000000
+#define META_0164 0x00010002
+#define META_0165 0x00570057
+#define META_0166 0x57726974
+#define META_0167 0x65496E74
+#define META_0168 0x33320000
+#define META_0169 0x00000000
+#define META_0170 0x00010002
+#define META_0171 0x0051005D
+#define META_0172 0x57726974
+#define META_0173 0x65427974
+#define META_0174 0x65000000
+#define META_0175 0x00000000
+#define META_0176 0x00010002
+#define META_0177 0x004B005B
+#define META_0178 0x57726974
+#define META_0179 0x6555496E
+#define META_0180 0x74313600
+#define META_0181 0x00000000
+#define META_0182 0x00010002
+#define META_0183 0x00450059
+#define META_0184 0x57726974
+#define META_0185 0x6555496E
+#define META_0186 0x74333200
+#define META_0187 0x00000000
+#define META_0188 0x00010002
+#define META_0189 0x003F0057
+#define META_0190 0x57726974
+#define META_0191 0x6553696E
+#define META_0192 0x676C6500
+#define META_0193 0x00000000
+#define META_0194 0x00010002
+#define META_0195 0x00390055
+#define META_0196 0x57726974
+#define META_0197 0x65446F75
+#define META_0198 0x626C6500
+#define META_0199 0x00000000
+#define META_0200 0x00010003
+#define META_0201 0x0033001E
+#define META_0202 0x00335772
+#define META_0203 0x69746542
+#define META_0204 0x79746542
+#define META_0205 0x75666665
+#define META_0206 0x72000000
+#define META_0207 0x00000000
+#define META_0208 0x00010000
+#define META_0209 0x456E6457
+#define META_0210 0x72697465
+#define META_0211 0x47726F75
+#define META_0212 0x70000000
+#define META_0213 0x00000000
+#define META_0214 0x00010000
+#define META_0215 0x456E6457
+#define META_0216 0x72697465
+#define META_0217 0x416C6C00
+#define META_0218 0x00000713
+#define META_0219 0x00000000
+#define META_0220 0x00000000
+#define META_0221 0x805017D0
+#define META_0222 0x00000000
+#define META_0223 0x00000008
+#define META_0224 0x00000019
+#define META_0225 0x5B5D0000
+#define META_0226 0x00000713
+#define META_0227 0x00000000
+#define META_0228 0x00000000
+#define META_0229 0x804006F0
+#define META_0230 0x00000000
+#define META_0231 0x00000008
+#define META_0232 0x00000021
+#define META_0233 0x2A000000
+#define META_0234 0x00000212
+#define META_0235 0x53797374
+#define META_0236 0x656D0000
+#define META_0237 0x0000031A
+#define META_0238 0xFFFFFFFD
+#define META_0239 0x4F626A65
+#define META_0240 0x63740000
+#define META_0241 0x00000312
+#define META_0242 0x45636C72
+#define META_0243 0x2E50636F
+#define META_0244 0x73000000
+#define META_0245 0x0000031A
+#define META_0246 0xFFFFFFFC
+#define META_0247 0x494F4772
+#define META_0248 0x6F757000
+#define META_0249 0x0000031A
+#define META_0250 0xFFFFFFF1
+#define META_0251 0x496E7433
+#define META_0252 0x32000000
+#define META_0253 0x0000031A
+#define META_0254 0xFFFFFFED
+#define META_0255 0x53427974
+#define META_0256 0x65000000
+#define META_0257 0x0000031A
+#define META_0258 0xFFFFFFE9
+#define META_0259 0x496E7431
+#define META_0260 0x36000000
+#define META_0261 0x0000031A
+#define META_0262 0xFFFFFFE5
+#define META_0263 0x42797465
+#define META_0264 0x00000000
+#define META_0265 0x0000031A
+#define META_0266 0xFFFFFFE1
+#define META_0267 0x55496E74
+#define META_0268 0x31360000
+#define META_0269 0x0000031A
+#define META_0270 0xFFFFFFDD
+#define META_0271 0x55496E74
+#define META_0272 0x33320000
+#define META_0273 0x0000031A
+#define META_0274 0xFFFFFFD9
+#define META_0275 0x53696E67
+#define META_0276 0x6C650000
+#define META_0277 0x0000031A
+#define META_0278 0xFFFFFFD5
+#define META_0279 0x446F7562
+#define META_0280 0x6C650000
+#define META_0281 0x00000001
+
+#undef META_0021
+#define META_0021 TYPEINFO_SET_SIZE32BE(0x00000004, sizeof(IO_DRIVER_LIB::KWIODriver)) // sizeof(IO_DRIVER_LIB::KWIODriver)
+#undef META_0041
+#define META_0041 0x00000000  // IO_DRIVER_LIB::KWIODriver::.ctor (non-static)
+#undef META_0045
+#define META_0045 0x00000000  // IO_DRIVER_LIB::KWIODriver::Init (non-static)
+#undef META_0050
+#define META_0050 0x00000000  // IO_DRIVER_LIB::KWIODriver::Open (non-static)
+#undef META_0054
+#define META_0054 0x00000000  // IO_DRIVER_LIB::KWIODriver::Close (non-static)
+#undef META_0058
+#define META_0058 0x00000000  // IO_DRIVER_LIB::KWIODriver::BeginReadAll (non-static)
+#undef META_0064
+#define META_0064 0x00000000  // IO_DRIVER_LIB::KWIODriver::BeginReadGroup (non-static)
+#undef META_0071
+#define META_0071 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadSByte (non-static)
+#undef META_0077
+#define META_0077 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadInt16 (non-static)
+#undef META_0083
+#define META_0083 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadInt32 (non-static)
+#undef META_0089
+#define META_0089 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadByte (non-static)
+#undef META_0095
+#define META_0095 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadUInt16 (non-static)
+#undef META_0101
+#define META_0101 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadUInt32 (non-static)
+#undef META_0107
+#define META_0107 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadSingle (non-static)
+#undef META_0113
+#define META_0113 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadDouble (non-static)
+#undef META_0119
+#define META_0119 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadByteBuffer (non-static)
+#undef META_0127
+#define META_0127 0x00000000  // IO_DRIVER_LIB::KWIODriver::EndReadGroup (non-static)
+#undef META_0133
+#define META_0133 0x00000000  // IO_DRIVER_LIB::KWIODriver::EndReadAll (non-static)
+#undef META_0138
+#define META_0138 0x00000000  // IO_DRIVER_LIB::KWIODriver::BeginWriteAll (non-static)
+#undef META_0144
+#define META_0144 0x00000000  // IO_DRIVER_LIB::KWIODriver::BeginWriteGroup (non-static)
+#undef META_0151
+#define META_0151 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteSByte (non-static)
+#undef META_0157
+#define META_0157 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteInt16 (non-static)
+#undef META_0163
+#define META_0163 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteInt32 (non-static)
+#undef META_0169
+#define META_0169 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteByte (non-static)
+#undef META_0175
+#define META_0175 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteUInt16 (non-static)
+#undef META_0181
+#define META_0181 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteUInt32 (non-static)
+#undef META_0187
+#define META_0187 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteSingle (non-static)
+#undef META_0193
+#define META_0193 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteDouble (non-static)
+#undef META_0199
+#define META_0199 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteByteBuffer (non-static)
+#undef META_0207
+#define META_0207 0x00000000  // IO_DRIVER_LIB::KWIODriver::EndWriteGroup (non-static)
+#undef META_0213
+#define META_0213 0x00000000  // IO_DRIVER_LIB::KWIODriver::EndWriteAll (non-static)
+
+t_meta IO_DRIVER_LIB_meta[282] = {
+    META_0000,META_0001,META_0002,META_0003,    // 000000 00 00 01 10 00 00 0A 04 00 00 08 11 00 01 00 01    ................ 
+    META_0004,META_0005,META_0006,META_0007,    // 000016 00 00 00 00 00 00 00 02 00 00 00 10 49 4F 5F 44    ............IO_D 
+    META_0008,META_0009,META_0010,META_0011,    // 000032 52 49 56 45 52 5F 4C 49 42 00 00 00 00 00 04 12    RIVER_LIB....... 
+    META_0012,META_0013,META_0014,META_0015,    // 000048 49 4F 5F 44 52 49 56 45 52 5F 4C 49 42 00 00 00    IO_DRIVER_LIB... 
+    META_0016,META_0017,META_0018,META_0019,    // 000064 00 00 C9 13 00 00 00 00 00 00 00 00 82 10 07 20    ...............  
+    META_0020,META_0021,META_0022,META_0023,    // 000080 00 00 00 1E 00 00 00 04 00 DB FF F9 00 24 00 2B    .............$.+ 
+    META_0024,META_0025,META_0026,META_0027,    // 000096 00 34 00 3B 00 42 00 4D 00 5A 00 65 00 70 00 7B    .4.;.B.M.Z.e.p.. 
+    META_0028,META_0029,META_0030,META_0031,    // 000112 00 86 00 91 00 9C 00 A7 00 B2 00 C1 00 CC 00 D5    ................ 
+    META_0032,META_0033,META_0034,META_0035,    // 000128 00 E0 00 ED 00 F8 01 03 01 0E 01 19 01 24 01 2F    .............$./ 
+    META_0036,META_0037,META_0038,META_0039,    // 000144 01 3A 01 45 01 54 01 5F 4B 57 49 4F 44 72 69 76    .:.E.T._KWIODriv 
+    META_0040,META_0041,META_0042,META_0043,    // 000160 65 72 00 00 00 00 00 00 00 05 00 00 2E 63 74 6F    er...........cto 
+    META_0044,META_0045,META_0046,META_0047,    // 000176 72 00 00 00 00 00 00 00 00 01 00 02 00 B0 00 B0    r............... 
+    META_0048,META_0049,META_0050,META_0051,    // 000192 49 6E 69 74 00 00 00 00 00 00 00 00 00 01 00 00    Init............ 
+    META_0052,META_0053,META_0054,META_0055,    // 000208 4F 70 65 6E 00 00 00 00 00 00 00 00 00 01 00 00    Open............ 
+    META_0056,META_0057,META_0058,META_0059,    // 000224 43 6C 6F 73 65 00 00 00 00 00 00 00 00 01 00 00    Close........... 
+    META_0060,META_0061,META_0062,META_0063,    // 000240 42 65 67 69 6E 52 65 61 64 41 6C 6C 00 00 00 00    BeginReadAll.... 
+    META_0064,META_0065,META_0066,META_0067,    // 000256 00 00 00 00 00 01 00 01 00 BA 42 65 67 69 6E 52    ..........BeginR 
+    META_0068,META_0069,META_0070,META_0071,    // 000272 65 61 64 47 72 6F 75 70 00 00 00 00 00 00 00 00    eadGroup........ 
+    META_0072,META_0073,META_0074,META_0075,    // 000288 00 11 00 02 00 B7 00 B3 52 65 61 64 53 42 79 74    ........ReadSByt 
+    META_0076,META_0077,META_0078,META_0079,    // 000304 65 00 00 00 00 00 00 00 00 11 00 02 00 B5 00 AD    e............... 
+    META_0080,META_0081,META_0082,META_0083,    // 000320 52 65 61 64 49 6E 74 31 36 00 00 00 00 00 00 00    ReadInt16....... 
+    META_0084,META_0085,META_0086,META_0087,    // 000336 00 11 00 02 00 A7 00 A7 52 65 61 64 49 6E 74 33    ........ReadInt3 
+    META_0088,META_0089,META_0090,META_0091,    // 000352 32 00 00 00 00 00 00 00 00 11 00 02 00 AD 00 A1    2............... 
+    META_0092,META_0093,META_0094,META_0095,    // 000368 52 65 61 64 42 79 74 65 00 00 00 00 00 00 00 00    ReadByte........ 
+    META_0096,META_0097,META_0098,META_0099,    // 000384 00 11 00 02 00 AB 00 9B 52 65 61 64 55 49 6E 74    ........ReadUInt 
+    META_0100,META_0101,META_0102,META_0103,    // 000400 31 36 00 00 00 00 00 00 00 11 00 02 00 A9 00 95    16.............. 
+    META_0104,META_0105,META_0106,META_0107,    // 000416 52 65 61 64 55 49 6E 74 33 32 00 00 00 00 00 00    ReadUInt32...... 
+    META_0108,META_0109,META_0110,META_0111,    // 000432 00 11 00 02 00 A7 00 8F 52 65 61 64 53 69 6E 67    ........ReadSing 
+    META_0112,META_0113,META_0114,META_0115,    // 000448 6C 65 00 00 00 00 00 00 00 11 00 02 00 A5 00 89    le.............. 
+    META_0116,META_0117,META_0118,META_0119,    // 000464 52 65 61 64 44 6F 75 62 6C 65 00 00 00 00 00 00    ReadDouble...... 
+    META_0120,META_0121,META_0122,META_0123,    // 000480 00 01 00 03 00 83 00 6E 00 83 52 65 61 64 42 79    .......n..ReadBy 
+    META_0124,META_0125,META_0126,META_0127,    // 000496 74 65 42 75 66 66 65 72 00 00 00 00 00 00 00 00    teBuffer........ 
+    META_0128,META_0129,META_0130,META_0131,    // 000512 00 01 00 00 45 6E 64 52 65 61 64 47 72 6F 75 70    ....EndReadGroup 
+    META_0132,META_0133,META_0134,META_0135,    // 000528 00 00 00 00 00 00 00 00 00 01 00 00 45 6E 64 52    ............EndR 
+    META_0136,META_0137,META_0138,META_0139,    // 000544 65 61 64 41 6C 6C 00 00 00 00 00 00 00 01 00 00    eadAll.......... 
+    META_0140,META_0141,META_0142,META_0143,    // 000560 42 65 67 69 6E 57 72 69 74 65 41 6C 6C 00 00 00    BeginWriteAll... 
+    META_0144,META_0145,META_0146,META_0147,    // 000576 00 00 00 00 00 01 00 01 00 6A 42 65 67 69 6E 57    .........jBeginW 
+    META_0148,META_0149,META_0150,META_0151,    // 000592 72 69 74 65 47 72 6F 75 70 00 00 00 00 00 00 00    riteGroup....... 
+    META_0152,META_0153,META_0154,META_0155,    // 000608 00 01 00 02 00 63 00 67 57 72 69 74 65 53 42 79    .....c.gWriteSBy 
+    META_0156,META_0157,META_0158,META_0159,    // 000624 74 65 00 00 00 00 00 00 00 01 00 02 00 5D 00 65    te...........].e 
+    META_0160,META_0161,META_0162,META_0163,    // 000640 57 72 69 74 65 49 6E 74 31 36 00 00 00 00 00 00    WriteInt16...... 
+    META_0164,META_0165,META_0166,META_0167,    // 000656 00 01 00 02 00 57 00 57 57 72 69 74 65 49 6E 74    .....W.WWriteInt 
+    META_0168,META_0169,META_0170,META_0171,    // 000672 33 32 00 00 00 00 00 00 00 01 00 02 00 51 00 5D    32...........Q.] 
+    META_0172,META_0173,META_0174,META_0175,    // 000688 57 72 69 74 65 42 79 74 65 00 00 00 00 00 00 00    WriteByte....... 
+    META_0176,META_0177,META_0178,META_0179,    // 000704 00 01 00 02 00 4B 00 5B 57 72 69 74 65 55 49 6E    .....K.[WriteUIn 
+    META_0180,META_0181,META_0182,META_0183,    // 000720 74 31 36 00 00 00 00 00 00 01 00 02 00 45 00 59    t16..........E.Y 
+    META_0184,META_0185,META_0186,META_0187,    // 000736 57 72 69 74 65 55 49 6E 74 33 32 00 00 00 00 00    WriteUInt32..... 
+    META_0188,META_0189,META_0190,META_0191,    // 000752 00 01 00 02 00 3F 00 57 57 72 69 74 65 53 69 6E    .....?.WWriteSin 
+    META_0192,META_0193,META_0194,META_0195,    // 000768 67 6C 65 00 00 00 00 00 00 01 00 02 00 39 00 55    gle..........9.U 
+    META_0196,META_0197,META_0198,META_0199,    // 000784 57 72 69 74 65 44 6F 75 62 6C 65 00 00 00 00 00    WriteDouble..... 
+    META_0200,META_0201,META_0202,META_0203,    // 000800 00 01 00 03 00 33 00 1E 00 33 57 72 69 74 65 42    .....3...3WriteB 
+    META_0204,META_0205,META_0206,META_0207,    // 000816 79 74 65 42 75 66 66 65 72 00 00 00 00 00 00 00    yteBuffer....... 
+    META_0208,META_0209,META_0210,META_0211,    // 000832 00 01 00 00 45 6E 64 57 72 69 74 65 47 72 6F 75    ....EndWriteGrou 
+    META_0212,META_0213,META_0214,META_0215,    // 000848 70 00 00 00 00 00 00 00 00 01 00 00 45 6E 64 57    p...........EndW 
+    META_0216,META_0217,META_0218,META_0219,    // 000864 72 69 74 65 41 6C 6C 00 00 00 07 13 00 00 00 00    riteAll......... 
+    META_0220,META_0221,META_0222,META_0223,    // 000880 00 00 00 00 80 50 17 D0 00 00 00 00 00 00 00 08    .....P.......... 
+    META_0224,META_0225,META_0226,META_0227,    // 000896 00 00 00 19 5B 5D 00 00 00 00 07 13 00 00 00 00    ....[].......... 
+    META_0228,META_0229,META_0230,META_0231,    // 000912 00 00 00 00 80 40 06 F0 00 00 00 00 00 00 00 08    .....@.......... 
+    META_0232,META_0233,META_0234,META_0235,    // 000928 00 00 00 21 2A 00 00 00 00 00 02 12 53 79 73 74    ...!*.......Syst 
+    META_0236,META_0237,META_0238,META_0239,    // 000944 65 6D 00 00 00 00 03 1A FF FF FF FD 4F 62 6A 65    em..........Obje 
+    META_0240,META_0241,META_0242,META_0243,    // 000960 63 74 00 00 00 00 03 12 45 63 6C 72 2E 50 63 6F    ct......Eclr.Pco 
+    META_0244,META_0245,META_0246,META_0247,    // 000976 73 00 00 00 00 00 03 1A FF FF FF FC 49 4F 47 72    s...........IOGr 
+    META_0248,META_0249,META_0250,META_0251,    // 000992 6F 75 70 00 00 00 03 1A FF FF FF F1 49 6E 74 33    oup.........Int3 
+    META_0252,META_0253,META_0254,META_0255,    // 001008 32 00 00 00 00 00 03 1A FF FF FF ED 53 42 79 74    2...........SByt 
+    META_0256,META_0257,META_0258,META_0259,    // 001024 65 00 00 00 00 00 03 1A FF FF FF E9 49 6E 74 31    e...........Int1 
+    META_0260,META_0261,META_0262,META_0263,    // 001040 36 00 00 00 00 00 03 1A FF FF FF E5 42 79 74 65    6...........Byte 
+    META_0264,META_0265,META_0266,META_0267,    // 001056 00 00 00 00 00 00 03 1A FF FF FF E1 55 49 6E 74    ............UInt 
+    META_0268,META_0269,META_0270,META_0271,    // 001072 31 36 00 00 00 00 03 1A FF FF FF DD 55 49 6E 74    16..........UInt 
+    META_0272,META_0273,META_0274,META_0275,    // 001088 33 32 00 00 00 00 03 1A FF FF FF D9 53 69 6E 67    32..........Sing 
+    META_0276,META_0277,META_0278,META_0279,    // 001104 6C 65 00 00 00 00 03 1A FF FF FF D5 44 6F 75 62    le..........Doub 
+    META_0280,META_0281    // 001120 6C 65 00 00 00 00 00 01    le...... 
+    };
+
+
+#elif (PLATFORM_TARGET_ENDIANESS == TARGET_LITTLE_ENDIAN)
+#define META_0000 0x00000110
+#define META_0001 0x0A040000
+#define META_0002 0x00000811
+#define META_0003 0x00010001
+#define META_0004 0x00000000
+#define META_0005 0x00020000
+#define META_0006 0x00100000
+#define META_0007 0x445F4F49
+#define META_0008 0x45564952
+#define META_0009 0x494C5F52
+#define META_0010 0x00000042
+#define META_0011 0x00000412
+#define META_0012 0x445F4F49
+#define META_0013 0x45564952
+#define META_0014 0x494C5F52
+#define META_0015 0x00000042
+#define META_0016 0x0000C913
+#define META_0017 0x00000000
+#define META_0018 0x00000000
+#define META_0019 0x07208210
+#define META_0020 0x001E0000
+#define META_0021 0x00000004
+#define META_0022 0xFFF900DB
+#define META_0023 0x002B0024
+#define META_0024 0x003B0034
+#define META_0025 0x004D0042
+#define META_0026 0x0065005A
+#define META_0027 0x007B0070
+#define META_0028 0x00910086
+#define META_0029 0x00A7009C
+#define META_0030 0x00C100B2
+#define META_0031 0x00D500CC
+#define META_0032 0x00ED00E0
+#define META_0033 0x010300F8
+#define META_0034 0x0119010E
+#define META_0035 0x012F0124
+#define META_0036 0x0145013A
+#define META_0037 0x015F0154
+#define META_0038 0x4F49574B
+#define META_0039 0x76697244
+#define META_0040 0x00007265
+#define META_0041 0x00000000
+#define META_0042 0x00000005
+#define META_0043 0x6F74632E
+#define META_0044 0x00000072
+#define META_0045 0x00000000
+#define META_0046 0x00020001
+#define META_0047 0x00B000B0
+#define META_0048 0x74696E49
+#define META_0049 0x00000000
+#define META_0050 0x00000000
+#define META_0051 0x00000001
+#define META_0052 0x6E65704F
+#define META_0053 0x00000000
+#define META_0054 0x00000000
+#define META_0055 0x00000001
+#define META_0056 0x736F6C43
+#define META_0057 0x00000065
+#define META_0058 0x00000000
+#define META_0059 0x00000001
+#define META_0060 0x69676542
+#define META_0061 0x6165526E
+#define META_0062 0x6C6C4164
+#define META_0063 0x00000000
+#define META_0064 0x00000000
+#define META_0065 0x00010001
+#define META_0066 0x654200BA
+#define META_0067 0x526E6967
+#define META_0068 0x47646165
+#define META_0069 0x70756F72
+#define META_0070 0x00000000
+#define META_0071 0x00000000
+#define META_0072 0x00020011
+#define META_0073 0x00B300B7
+#define META_0074 0x64616552
+#define META_0075 0x74794253
+#define META_0076 0x00000065
+#define META_0077 0x00000000
+#define META_0078 0x00020011
+#define META_0079 0x00AD00B5
+#define META_0080 0x64616552
+#define META_0081 0x31746E49
+#define META_0082 0x00000036
+#define META_0083 0x00000000
+#define META_0084 0x00020011
+#define META_0085 0x00A700A7
+#define META_0086 0x64616552
+#define META_0087 0x33746E49
+#define META_0088 0x00000032
+#define META_0089 0x00000000
+#define META_0090 0x00020011
+#define META_0091 0x00A100AD
+#define META_0092 0x64616552
+#define META_0093 0x65747942
+#define META_0094 0x00000000
+#define META_0095 0x00000000
+#define META_0096 0x00020011
+#define META_0097 0x009B00AB
+#define META_0098 0x64616552
+#define META_0099 0x746E4955
+#define META_0100 0x00003631
+#define META_0101 0x00000000
+#define META_0102 0x00020011
+#define META_0103 0x009500A9
+#define META_0104 0x64616552
+#define META_0105 0x746E4955
+#define META_0106 0x00003233
+#define META_0107 0x00000000
+#define META_0108 0x00020011
+#define META_0109 0x008F00A7
+#define META_0110 0x64616552
+#define META_0111 0x676E6953
+#define META_0112 0x0000656C
+#define META_0113 0x00000000
+#define META_0114 0x00020011
+#define META_0115 0x008900A5
+#define META_0116 0x64616552
+#define META_0117 0x62756F44
+#define META_0118 0x0000656C
+#define META_0119 0x00000000
+#define META_0120 0x00030001
+#define META_0121 0x006E0083
+#define META_0122 0x65520083
+#define META_0123 0x79426461
+#define META_0124 0x75426574
+#define META_0125 0x72656666
+#define META_0126 0x00000000
+#define META_0127 0x00000000
+#define META_0128 0x00000001
+#define META_0129 0x52646E45
+#define META_0130 0x47646165
+#define META_0131 0x70756F72
+#define META_0132 0x00000000
+#define META_0133 0x00000000
+#define META_0134 0x00000001
+#define META_0135 0x52646E45
+#define META_0136 0x41646165
+#define META_0137 0x00006C6C
+#define META_0138 0x00000000
+#define META_0139 0x00000001
+#define META_0140 0x69676542
+#define META_0141 0x6972576E
+#define META_0142 0x6C416574
+#define META_0143 0x0000006C
+#define META_0144 0x00000000
+#define META_0145 0x00010001
+#define META_0146 0x6542006A
+#define META_0147 0x576E6967
+#define META_0148 0x65746972
+#define META_0149 0x756F7247
+#define META_0150 0x00000070
+#define META_0151 0x00000000
+#define META_0152 0x00020001
+#define META_0153 0x00670063
+#define META_0154 0x74697257
+#define META_0155 0x79425365
+#define META_0156 0x00006574
+#define META_0157 0x00000000
+#define META_0158 0x00020001
+#define META_0159 0x0065005D
+#define META_0160 0x74697257
+#define META_0161 0x746E4965
+#define META_0162 0x00003631
+#define META_0163 0x00000000
+#define META_0164 0x00020001
+#define META_0165 0x00570057
+#define META_0166 0x74697257
+#define META_0167 0x746E4965
+#define META_0168 0x00003233
+#define META_0169 0x00000000
+#define META_0170 0x00020001
+#define META_0171 0x005D0051
+#define META_0172 0x74697257
+#define META_0173 0x74794265
+#define META_0174 0x00000065
+#define META_0175 0x00000000
+#define META_0176 0x00020001
+#define META_0177 0x005B004B
+#define META_0178 0x74697257
+#define META_0179 0x6E495565
+#define META_0180 0x00363174
+#define META_0181 0x00000000
+#define META_0182 0x00020001
+#define META_0183 0x00590045
+#define META_0184 0x74697257
+#define META_0185 0x6E495565
+#define META_0186 0x00323374
+#define META_0187 0x00000000
+#define META_0188 0x00020001
+#define META_0189 0x0057003F
+#define META_0190 0x74697257
+#define META_0191 0x6E695365
+#define META_0192 0x00656C67
+#define META_0193 0x00000000
+#define META_0194 0x00020001
+#define META_0195 0x00550039
+#define META_0196 0x74697257
+#define META_0197 0x756F4465
+#define META_0198 0x00656C62
+#define META_0199 0x00000000
+#define META_0200 0x00030001
+#define META_0201 0x001E0033
+#define META_0202 0x72570033
+#define META_0203 0x42657469
+#define META_0204 0x42657479
+#define META_0205 0x65666675
+#define META_0206 0x00000072
+#define META_0207 0x00000000
+#define META_0208 0x00000001
+#define META_0209 0x57646E45
+#define META_0210 0x65746972
+#define META_0211 0x756F7247
+#define META_0212 0x00000070
+#define META_0213 0x00000000
+#define META_0214 0x00000001
+#define META_0215 0x57646E45
+#define META_0216 0x65746972
+#define META_0217 0x006C6C41
+#define META_0218 0x00000713
+#define META_0219 0x00000000
+#define META_0220 0x00000000
+#define META_0221 0x17D08050
+#define META_0222 0x00000000
+#define META_0223 0x00000008
+#define META_0224 0x00190000
+#define META_0225 0x00005D5B
+#define META_0226 0x00000713
+#define META_0227 0x00000000
+#define META_0228 0x00000000
+#define META_0229 0x06F08040
+#define META_0230 0x00000000
+#define META_0231 0x00000008
+#define META_0232 0x00210000
+#define META_0233 0x0000002A
+#define META_0234 0x00000212
+#define META_0235 0x74737953
+#define META_0236 0x00006D65
+#define META_0237 0x0000031A
+#define META_0238 0xFFFDFFFF
+#define META_0239 0x656A624F
+#define META_0240 0x00007463
+#define META_0241 0x00000312
+#define META_0242 0x726C6345
+#define META_0243 0x6F63502E
+#define META_0244 0x00000073
+#define META_0245 0x0000031A
+#define META_0246 0xFFFCFFFF
+#define META_0247 0x72474F49
+#define META_0248 0x0070756F
+#define META_0249 0x0000031A
+#define META_0250 0xFFF1FFFF
+#define META_0251 0x33746E49
+#define META_0252 0x00000032
+#define META_0253 0x0000031A
+#define META_0254 0xFFEDFFFF
+#define META_0255 0x74794253
+#define META_0256 0x00000065
+#define META_0257 0x0000031A
+#define META_0258 0xFFE9FFFF
+#define META_0259 0x31746E49
+#define META_0260 0x00000036
+#define META_0261 0x0000031A
+#define META_0262 0xFFE5FFFF
+#define META_0263 0x65747942
+#define META_0264 0x00000000
+#define META_0265 0x0000031A
+#define META_0266 0xFFE1FFFF
+#define META_0267 0x746E4955
+#define META_0268 0x00003631
+#define META_0269 0x0000031A
+#define META_0270 0xFFDDFFFF
+#define META_0271 0x746E4955
+#define META_0272 0x00003233
+#define META_0273 0x0000031A
+#define META_0274 0xFFD9FFFF
+#define META_0275 0x676E6953
+#define META_0276 0x0000656C
+#define META_0277 0x0000031A
+#define META_0278 0xFFD5FFFF
+#define META_0279 0x62756F44
+#define META_0280 0x0000656C
+#define META_0281 0x00000001
+
+#undef META_0021
+#define META_0021 TYPEINFO_SET_SIZE32LE(0x00000004, sizeof(IO_DRIVER_LIB::KWIODriver)) // sizeof(IO_DRIVER_LIB::KWIODriver)
+#undef META_0041
+#define META_0041 0x00000000  // IO_DRIVER_LIB::KWIODriver::.ctor (non-static)
+#undef META_0045
+#define META_0045 0x00000000  // IO_DRIVER_LIB::KWIODriver::Init (non-static)
+#undef META_0050
+#define META_0050 0x00000000  // IO_DRIVER_LIB::KWIODriver::Open (non-static)
+#undef META_0054
+#define META_0054 0x00000000  // IO_DRIVER_LIB::KWIODriver::Close (non-static)
+#undef META_0058
+#define META_0058 0x00000000  // IO_DRIVER_LIB::KWIODriver::BeginReadAll (non-static)
+#undef META_0064
+#define META_0064 0x00000000  // IO_DRIVER_LIB::KWIODriver::BeginReadGroup (non-static)
+#undef META_0071
+#define META_0071 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadSByte (non-static)
+#undef META_0077
+#define META_0077 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadInt16 (non-static)
+#undef META_0083
+#define META_0083 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadInt32 (non-static)
+#undef META_0089
+#define META_0089 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadByte (non-static)
+#undef META_0095
+#define META_0095 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadUInt16 (non-static)
+#undef META_0101
+#define META_0101 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadUInt32 (non-static)
+#undef META_0107
+#define META_0107 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadSingle (non-static)
+#undef META_0113
+#define META_0113 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadDouble (non-static)
+#undef META_0119
+#define META_0119 0x00000000  // IO_DRIVER_LIB::KWIODriver::ReadByteBuffer (non-static)
+#undef META_0127
+#define META_0127 0x00000000  // IO_DRIVER_LIB::KWIODriver::EndReadGroup (non-static)
+#undef META_0133
+#define META_0133 0x00000000  // IO_DRIVER_LIB::KWIODriver::EndReadAll (non-static)
+#undef META_0138
+#define META_0138 0x00000000  // IO_DRIVER_LIB::KWIODriver::BeginWriteAll (non-static)
+#undef META_0144
+#define META_0144 0x00000000  // IO_DRIVER_LIB::KWIODriver::BeginWriteGroup (non-static)
+#undef META_0151
+#define META_0151 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteSByte (non-static)
+#undef META_0157
+#define META_0157 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteInt16 (non-static)
+#undef META_0163
+#define META_0163 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteInt32 (non-static)
+#undef META_0169
+#define META_0169 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteByte (non-static)
+#undef META_0175
+#define META_0175 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteUInt16 (non-static)
+#undef META_0181
+#define META_0181 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteUInt32 (non-static)
+#undef META_0187
+#define META_0187 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteSingle (non-static)
+#undef META_0193
+#define META_0193 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteDouble (non-static)
+#undef META_0199
+#define META_0199 0x00000000  // IO_DRIVER_LIB::KWIODriver::WriteByteBuffer (non-static)
+#undef META_0207
+#define META_0207 0x00000000  // IO_DRIVER_LIB::KWIODriver::EndWriteGroup (non-static)
+#undef META_0213
+#define META_0213 0x00000000  // IO_DRIVER_LIB::KWIODriver::EndWriteAll (non-static)
+
+t_meta IO_DRIVER_LIB_meta[282] = {
+    META_0000,META_0001,META_0002,META_0003,    // 000000 10 01 00 00 00 00 04 0A 11 08 00 00 01 00 01 00    ................ 
+    META_0004,META_0005,META_0006,META_0007,    // 000016 00 00 00 00 00 00 02 00 00 00 10 00 49 4F 5F 44    ............IO_D 
+    META_0008,META_0009,META_0010,META_0011,    // 000032 52 49 56 45 52 5F 4C 49 42 00 00 00 12 04 00 00    RIVER_LIB....... 
+    META_0012,META_0013,META_0014,META_0015,    // 000048 49 4F 5F 44 52 49 56 45 52 5F 4C 49 42 00 00 00    IO_DRIVER_LIB... 
+    META_0016,META_0017,META_0018,META_0019,    // 000064 13 C9 00 00 00 00 00 00 00 00 00 00 10 82 20 07    .............. . 
+    META_0020,META_0021,META_0022,META_0023,    // 000080 00 00 1E 00 04 00 00 00 DB 00 F9 FF 24 00 2B 00    ............$.+. 
+    META_0024,META_0025,META_0026,META_0027,    // 000096 34 00 3B 00 42 00 4D 00 5A 00 65 00 70 00 7B 00    4.;.B.M.Z.e.p... 
+    META_0028,META_0029,META_0030,META_0031,    // 000112 86 00 91 00 9C 00 A7 00 B2 00 C1 00 CC 00 D5 00    ................ 
+    META_0032,META_0033,META_0034,META_0035,    // 000128 E0 00 ED 00 F8 00 03 01 0E 01 19 01 24 01 2F 01    ............$./. 
+    META_0036,META_0037,META_0038,META_0039,    // 000144 3A 01 45 01 54 01 5F 01 4B 57 49 4F 44 72 69 76    :.E.T._.KWIODriv 
+    META_0040,META_0041,META_0042,META_0043,    // 000160 65 72 00 00 00 00 00 00 05 00 00 00 2E 63 74 6F    er...........cto 
+    META_0044,META_0045,META_0046,META_0047,    // 000176 72 00 00 00 00 00 00 00 01 00 02 00 B0 00 B0 00    r............... 
+    META_0048,META_0049,META_0050,META_0051,    // 000192 49 6E 69 74 00 00 00 00 00 00 00 00 01 00 00 00    Init............ 
+    META_0052,META_0053,META_0054,META_0055,    // 000208 4F 70 65 6E 00 00 00 00 00 00 00 00 01 00 00 00    Open............ 
+    META_0056,META_0057,META_0058,META_0059,    // 000224 43 6C 6F 73 65 00 00 00 00 00 00 00 01 00 00 00    Close........... 
+    META_0060,META_0061,META_0062,META_0063,    // 000240 42 65 67 69 6E 52 65 61 64 41 6C 6C 00 00 00 00    BeginReadAll.... 
+    META_0064,META_0065,META_0066,META_0067,    // 000256 00 00 00 00 01 00 01 00 BA 00 42 65 67 69 6E 52    ..........BeginR 
+    META_0068,META_0069,META_0070,META_0071,    // 000272 65 61 64 47 72 6F 75 70 00 00 00 00 00 00 00 00    eadGroup........ 
+    META_0072,META_0073,META_0074,META_0075,    // 000288 11 00 02 00 B7 00 B3 00 52 65 61 64 53 42 79 74    ........ReadSByt 
+    META_0076,META_0077,META_0078,META_0079,    // 000304 65 00 00 00 00 00 00 00 11 00 02 00 B5 00 AD 00    e............... 
+    META_0080,META_0081,META_0082,META_0083,    // 000320 52 65 61 64 49 6E 74 31 36 00 00 00 00 00 00 00    ReadInt16....... 
+    META_0084,META_0085,META_0086,META_0087,    // 000336 11 00 02 00 A7 00 A7 00 52 65 61 64 49 6E 74 33    ........ReadInt3 
+    META_0088,META_0089,META_0090,META_0091,    // 000352 32 00 00 00 00 00 00 00 11 00 02 00 AD 00 A1 00    2............... 
+    META_0092,META_0093,META_0094,META_0095,    // 000368 52 65 61 64 42 79 74 65 00 00 00 00 00 00 00 00    ReadByte........ 
+    META_0096,META_0097,META_0098,META_0099,    // 000384 11 00 02 00 AB 00 9B 00 52 65 61 64 55 49 6E 74    ........ReadUInt 
+    META_0100,META_0101,META_0102,META_0103,    // 000400 31 36 00 00 00 00 00 00 11 00 02 00 A9 00 95 00    16.............. 
+    META_0104,META_0105,META_0106,META_0107,    // 000416 52 65 61 64 55 49 6E 74 33 32 00 00 00 00 00 00    ReadUInt32...... 
+    META_0108,META_0109,META_0110,META_0111,    // 000432 11 00 02 00 A7 00 8F 00 52 65 61 64 53 69 6E 67    ........ReadSing 
+    META_0112,META_0113,META_0114,META_0115,    // 000448 6C 65 00 00 00 00 00 00 11 00 02 00 A5 00 89 00    le.............. 
+    META_0116,META_0117,META_0118,META_0119,    // 000464 52 65 61 64 44 6F 75 62 6C 65 00 00 00 00 00 00    ReadDouble...... 
+    META_0120,META_0121,META_0122,META_0123,    // 000480 01 00 03 00 83 00 6E 00 83 00 52 65 61 64 42 79    ......n...ReadBy 
+    META_0124,META_0125,META_0126,META_0127,    // 000496 74 65 42 75 66 66 65 72 00 00 00 00 00 00 00 00    teBuffer........ 
+    META_0128,META_0129,META_0130,META_0131,    // 000512 01 00 00 00 45 6E 64 52 65 61 64 47 72 6F 75 70    ....EndReadGroup 
+    META_0132,META_0133,META_0134,META_0135,    // 000528 00 00 00 00 00 00 00 00 01 00 00 00 45 6E 64 52    ............EndR 
+    META_0136,META_0137,META_0138,META_0139,    // 000544 65 61 64 41 6C 6C 00 00 00 00 00 00 01 00 00 00    eadAll.......... 
+    META_0140,META_0141,META_0142,META_0143,    // 000560 42 65 67 69 6E 57 72 69 74 65 41 6C 6C 00 00 00    BeginWriteAll... 
+    META_0144,META_0145,META_0146,META_0147,    // 000576 00 00 00 00 01 00 01 00 6A 00 42 65 67 69 6E 57    ........j.BeginW 
+    META_0148,META_0149,META_0150,META_0151,    // 000592 72 69 74 65 47 72 6F 75 70 00 00 00 00 00 00 00    riteGroup....... 
+    META_0152,META_0153,META_0154,META_0155,    // 000608 01 00 02 00 63 00 67 00 57 72 69 74 65 53 42 79    ....c.g.WriteSBy 
+    META_0156,META_0157,META_0158,META_0159,    // 000624 74 65 00 00 00 00 00 00 01 00 02 00 5D 00 65 00    te..........].e. 
+    META_0160,META_0161,META_0162,META_0163,    // 000640 57 72 69 74 65 49 6E 74 31 36 00 00 00 00 00 00    WriteInt16...... 
+    META_0164,META_0165,META_0166,META_0167,    // 000656 01 00 02 00 57 00 57 00 57 72 69 74 65 49 6E 74    ....W.W.WriteInt 
+    META_0168,META_0169,META_0170,META_0171,    // 000672 33 32 00 00 00 00 00 00 01 00 02 00 51 00 5D 00    32..........Q.]. 
+    META_0172,META_0173,META_0174,META_0175,    // 000688 57 72 69 74 65 42 79 74 65 00 00 00 00 00 00 00    WriteByte....... 
+    META_0176,META_0177,META_0178,META_0179,    // 000704 01 00 02 00 4B 00 5B 00 57 72 69 74 65 55 49 6E    ....K.[.WriteUIn 
+    META_0180,META_0181,META_0182,META_0183,    // 000720 74 31 36 00 00 00 00 00 01 00 02 00 45 00 59 00    t16.........E.Y. 
+    META_0184,META_0185,META_0186,META_0187,    // 000736 57 72 69 74 65 55 49 6E 74 33 32 00 00 00 00 00    WriteUInt32..... 
+    META_0188,META_0189,META_0190,META_0191,    // 000752 01 00 02 00 3F 00 57 00 57 72 69 74 65 53 69 6E    ....?.W.WriteSin 
+    META_0192,META_0193,META_0194,META_0195,    // 000768 67 6C 65 00 00 00 00 00 01 00 02 00 39 00 55 00    gle.........9.U. 
+    META_0196,META_0197,META_0198,META_0199,    // 000784 57 72 69 74 65 44 6F 75 62 6C 65 00 00 00 00 00    WriteDouble..... 
+    META_0200,META_0201,META_0202,META_0203,    // 000800 01 00 03 00 33 00 1E 00 33 00 57 72 69 74 65 42    ....3...3.WriteB 
+    META_0204,META_0205,META_0206,META_0207,    // 000816 79 74 65 42 75 66 66 65 72 00 00 00 00 00 00 00    yteBuffer....... 
+    META_0208,META_0209,META_0210,META_0211,    // 000832 01 00 00 00 45 6E 64 57 72 69 74 65 47 72 6F 75    ....EndWriteGrou 
+    META_0212,META_0213,META_0214,META_0215,    // 000848 70 00 00 00 00 00 00 00 01 00 00 00 45 6E 64 57    p...........EndW 
+    META_0216,META_0217,META_0218,META_0219,    // 000864 72 69 74 65 41 6C 6C 00 13 07 00 00 00 00 00 00    riteAll......... 
+    META_0220,META_0221,META_0222,META_0223,    // 000880 00 00 00 00 50 80 D0 17 00 00 00 00 08 00 00 00    ....P........... 
+    META_0224,META_0225,META_0226,META_0227,    // 000896 00 00 19 00 5B 5D 00 00 13 07 00 00 00 00 00 00    ....[].......... 
+    META_0228,META_0229,META_0230,META_0231,    // 000912 00 00 00 00 40 80 F0 06 00 00 00 00 08 00 00 00    ....@........... 
+    META_0232,META_0233,META_0234,META_0235,    // 000928 00 00 21 00 2A 00 00 00 12 02 00 00 53 79 73 74    ..!.*.......Syst 
+    META_0236,META_0237,META_0238,META_0239,    // 000944 65 6D 00 00 1A 03 00 00 FF FF FD FF 4F 62 6A 65    em..........Obje 
+    META_0240,META_0241,META_0242,META_0243,    // 000960 63 74 00 00 12 03 00 00 45 63 6C 72 2E 50 63 6F    ct......Eclr.Pco 
+    META_0244,META_0245,META_0246,META_0247,    // 000976 73 00 00 00 1A 03 00 00 FF FF FC FF 49 4F 47 72    s...........IOGr 
+    META_0248,META_0249,META_0250,META_0251,    // 000992 6F 75 70 00 1A 03 00 00 FF FF F1 FF 49 6E 74 33    oup.........Int3 
+    META_0252,META_0253,META_0254,META_0255,    // 001008 32 00 00 00 1A 03 00 00 FF FF ED FF 53 42 79 74    2...........SByt 
+    META_0256,META_0257,META_0258,META_0259,    // 001024 65 00 00 00 1A 03 00 00 FF FF E9 FF 49 6E 74 31    e...........Int1 
+    META_0260,META_0261,META_0262,META_0263,    // 001040 36 00 00 00 1A 03 00 00 FF FF E5 FF 42 79 74 65    6...........Byte 
+    META_0264,META_0265,META_0266,META_0267,    // 001056 00 00 00 00 1A 03 00 00 FF FF E1 FF 55 49 6E 74    ............UInt 
+    META_0268,META_0269,META_0270,META_0271,    // 001072 31 36 00 00 1A 03 00 00 FF FF DD FF 55 49 6E 74    16..........UInt 
+    META_0272,META_0273,META_0274,META_0275,    // 001088 33 32 00 00 1A 03 00 00 FF FF D9 FF 53 69 6E 67    32..........Sing 
+    META_0276,META_0277,META_0278,META_0279,    // 001104 6C 65 00 00 1A 03 00 00 FF FF D5 FF 44 6F 75 62    le..........Doub 
+    META_0280,META_0281    // 001120 6C 65 00 00 01 00 00 00    le...... 
+    };
+
+
+#else
+#error target endianess not defined
+#endif

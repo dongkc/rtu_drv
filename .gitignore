@@ -1,0 +1,7 @@
+build/
+cscope.in.out
+cscope.in
+cscope.out
+cscope.po.out
+../bak/
+../smartmodule/
