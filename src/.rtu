@@ -8,11 +8,10 @@
   <item name="grid">3</item>
  </group>
  <group name="windows">
-  <item id=".::modbus-mgr.cpp">-348,0,1236,435</item>
-  <item id=".::modbus-mgr.h">0,105,1236,435</item>
+  <item id=".::modbus-mgr.cpp">0,0,1193,604,*</item>
+  <item id=".::modbus-mgr.h">0,0,1236,435</item>
   <item id="AOs::ModbusMgr::SM">-305,0,1193,568</item>
   <item id=".::app.h">0,0,596,300</item>
-  <item id=".::qpobject.cpp">0,0,1193,568,*</item>
  </group>
  <group name="search">
   <item name="options">4129280</item>

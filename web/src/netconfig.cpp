@@ -39,10 +39,10 @@ void NetconfigHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco
 	responseStream << "<body>\n";
 	responseStream << "<div class=\"container\">\n";
 	responseStream << "    <div class=\"row-fluid\">\n";
-	responseStream << "        <div class=\"well span9\">\n";
+	responseStream << "        <div class=\"well span9\" align=\"center\">\n";
 	responseStream << "            <H3>网络参数配置</H3>\n";
 	responseStream << "            <FORM id=\"formNet\" method=\"post\"  action=\"/goform/NetConfig\">\n";
-	responseStream << "                <TABLE class=\"msgtable\" balign=\"center\" order=\"0\" cellSpacing=\"0\">\n";
+	responseStream << "                <TABLE class=\"msgtable\" order=\"0\" cellSpacing=\"0\">\n";
 	responseStream << "                    <TBODY>\n";
 	responseStream << "                    <TR>\n";
 	responseStream << "                        <TD align=\"right\">设备网络IP地址:</TD>\n";

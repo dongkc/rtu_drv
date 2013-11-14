@@ -2,7 +2,7 @@
 #define netconfig_INCLUDED
 
 
-#include "Poco/Net/HTTPRequestHandler.h"
+#include <Poco/Net/HTTPRequestHandler.h>
 
 
 class NetconfigHandler: public Poco::Net::HTTPRequestHandler

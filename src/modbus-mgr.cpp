@@ -25,7 +25,7 @@ using namespace std;
 namespace Zebra {
 
 
-static ModbusMgr modbusMgr("/dev/ttyS1", 115200, 'N', 8, 1);
+static ModbusMgr modbusMgr("/dev/ttyS1", 9600, 'N', 8, 1);
 QP::QActive * const AO_Modbus = &modbusMgr;
 
 #ifdef     Q_SPY
@@ -89,7 +89,7 @@ QP::QState ModbusMgr::running(ModbusMgr * const me, QP::QEvt const * const e) {
     switch (e->sig) {
         // @(/1/0/5/1)
         case Q_ENTRY_SIG: {
-            me->_timeEvt.postEvery(me, Zebra::BSP_TICKS_PER_SEC * 100);
+            me->_timeEvt.postEvery(me, Zebra::BSP_TICKS_PER_SEC * 100 );
             status_ = Q_HANDLED();
             break;
         }

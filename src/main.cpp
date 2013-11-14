@@ -62,7 +62,7 @@ protected:
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
 		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("A web server that shows how to work with HTML forms.");
+		helpFormatter.setHeader("A rtu server act as soft PLC.");
 		helpFormatter.format(std::cout);
 	}
 
