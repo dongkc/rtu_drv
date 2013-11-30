@@ -8,8 +8,13 @@
 #include "eclrEnvironment.h"
 #include "eclr.h"
 
-#include "IO_DRIVER_LIB.h"
-
+#include "CONSEN_SHM.h"
+#include "GT_LIB10.h"
+#include "CONSEN_IO.h"
+//liyamin_begin
+unsigned char SHM_Buff_SYS[65535];
+uint8 g_retain[100];
+//liyamin end
 #define STACK_BASE_SYS      PTHREAD_STACK_MIN + 0x8000
 
 // for thread with FIFO scheduling policy, priority ranges from 1 to 99 (low to high)
@@ -37,7 +42,65 @@ static void setPriorityScheme()
      mscorlib::PriorityClass::SetHighest(HIGH_PRIO, HIGH_PRIO);
 } 
 #endif  //PLATFORM_THREADING_SUPPORT
- void check_timer_overflow();
+
+// void check_timer_overflow();
+
+//liyamin begin
+// pcos domain default callback
+class MyPcosCB : public PcosCallback
+{
+public:
+    MyPcosCB()
+    {
+    }
+    void PlcOn()
+    {
+        printf("PcosCallback: PlcOn\n");
+    }
+    bool PlcLoading()
+    {
+
+        printf("PcosCallback: PlcLoading\n");
+        return true;
+    }
+    bool PlcStarting(enum PlcStartMode mode, bool& retry)
+    {
+        printf("PcosCallback: PlcStarting\n");
+		//
+		fnConfigFileLoad();
+        return true;
+    }
+    void PlcRunning()
+    {
+        printf("PcosCallback: PlcRunning\n");
+		
+    }
+    void PlcHalt()
+    {
+        printf("PcosCallback: PlcHalt\n");
+    }
+    bool PlcStopping(bool& retry)
+    {
+        printf("PcosCallback: PlcStopping\n");
+        return true;
+    }
+    void PlcStop()
+    {
+        printf("PcosCallback: PlcStop\n");
+    }
+    bool PlcResetting()
+    {
+        printf("PcosCallback: PlcResetting\n");
+        return true;
+    }
+    void PlcException(int code)
+    {
+        printf("PcosCallback: PlcException\n");
+    }
+};
+
+MyPcosCB myPcosCB;
+//liyamin end
 extern "C" int main(int argc, char* argv[] )
 {
     argc = argc;
@@ -88,14 +151,32 @@ extern "C" int main(int argc, char* argv[] )
 	 pPcosDomain->SetTicksPerSecond(0); // scheduler is working with time base of EclrEnvironment        
 #endif	
 	
+#if 0
     pPcosDomain->SetCPUCapacity(1000,   // int calcFreq_ms
                                 30,     // int minCPULoadPerCent
                                 80,     // int maxCPULoadPerCent
                                 4 );    // int minFreeTicks
-					
+#endif
+//liyamin begin
+    // set the application retentive memory space (simulated by volatile ram)
+    pPcosDomain->AnnounceRetentiveMemory(&g_retain, sizeof(g_retain));
+    // set a specific ProConOS callback to handle ProConOS state changes
+    pPcosDomain->setCallback(&myPcosCB);
+//liyamin end
+
+//LIYAMIN_BEGIN
+	//function library loading
+	GT_LIB10::init();
+	GT_LIB10::loadLibrary();
+	//share memory loading
+	CONSEN_SHM::init();
+	CONSEN_SHM::loadLibrary();
+			
+	//driver library loading
+	CONSEN_IO::init();
+	CONSEN_IO::loadLibrary();		
+//LIYAMIN END//
 		
-	IO_DRIVER_LIB::init();
-	IO_DRIVER_LIB::loadLibrary();			
     // pPcosDomain->WarmStartBootReq();
     pPcosDomain->ColdStartBootReq();
     // pPcosDomain->AnnounceRetentiveMemory(g_pCshmInterface->m_pMapAddr, 2048);
@@ -112,7 +193,6 @@ extern "C" int main(int argc, char* argv[] )
     // start remoting
     CRemotingDeamon::start();
  
-
  	// change the scheduling policy and priority of this thread
    struct sched_param zSchedParam;
    int policy;
@@ -126,15 +206,12 @@ extern "C" int main(int argc, char* argv[] )
     while (true)
     {
         ClrController::Process();
-	usleep(1 * 1000);
-	
-	check_timer_overflow();
+	    usleep(1 * 1000);
+	    //check_timer_overflow();
     }
     
    return 0;
 }
-
-
 
 #undef CLEAR_INSN_CACHE
 #define CLEAR_INSN_CACHE(BEG, END)					\
@@ -163,11 +240,7 @@ void EclrEnvironment::FlushCache( void* pData, unsigned int len )
   
 }
 
-
-
-
-
-
+#if 0
 #define TIMEOUT_HOUR 2
 int timer_1ms = 0;
 int timer_1s = 0;
@@ -222,6 +295,4 @@ void check_timer_overflow()
 	}
 	
 }
-
-
-
+#endif

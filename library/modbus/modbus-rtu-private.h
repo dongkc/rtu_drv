@@ -39,7 +39,7 @@
 
 /* Time waited beetween the RTS switch before transmit data or after transmit
    data before to read */
-#define _MODBUS_RTU_TIME_BETWEEN_RTS_SWITCH 900
+#define _MODBUS_RTU_TIME_BETWEEN_RTS_SWITCH 1800
 
 #if defined(_WIN32)
 #define ENOTSUP WSAEOPNOTSUPP

@@ -74,7 +74,7 @@ class IpAddr
       // from this IP address and a net mask
       //
       const IpAddr broadcast(const IpAddr& mask) const {
-            return IpAddr(mask.ipl & ipl | ~mask.ipl);
+            return IpAddr((mask.ipl & ipl) | ~mask.ipl);
             }
 
       int print(char* const buf) const {

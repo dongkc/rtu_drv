@@ -296,6 +296,7 @@ ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_length)
 
         size = write(ctx->s, req, req_length);
 
+        //fsync(ctx->s);
         usleep(_MODBUS_RTU_TIME_BETWEEN_RTS_SWITCH);
         _modbus_rtu_ioctl_rts(ctx->s, ctx_rtu->rts != MODBUS_RTU_RTS_UP);
 
@@ -563,7 +564,7 @@ static int _modbus_rtu_connect(modbus_t *ctx)
 
        Timeouts are ignored in canonical input mode or when the
        NDELAY option is set on the file via open or fcntl */
-    flags = O_RDWR | O_NOCTTY | O_NDELAY | O_EXCL;
+    flags = O_RDWR | O_NOCTTY | O_NDELAY | O_EXCL | O_SYNC;
 #ifdef O_CLOEXEC
     flags |= O_CLOEXEC;
 #endif
@@ -821,7 +822,11 @@ int modbus_rtu_set_serial_mode(modbus_t *ctx, int mode)
         memset(&rs485conf, 0x0, sizeof(struct serial_rs485));
 
         if (mode == MODBUS_RTU_RS485) {
-            rs485conf.flags = SER_RS485_ENABLED;
+            rs485conf.flags |= SER_RS485_ENABLED;
+            //rs485conf.flags |= SER_RS485_RTS_ON_SEND;
+            //rs485conf.flags &= ~(SER_RS485_RTS_AFTER_SEND);
+            //rs485conf.delay_rts_before_send = 50000;
+            //rs485conf.delay_rts_after_send = 10000;
             if (ioctl(ctx->s, TIOCSRS485, &rs485conf) < 0) {
                 return -1;
             }
