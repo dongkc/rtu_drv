@@ -1,16 +1,9 @@
-//
-// Gpio.cpp
-//
-//
-
 #include <fstream>
-
 #include "Gpio.h"
 
 using namespace std;
 
 namespace Zebra {
-
 
 Gpio::Gpio(const std::string& pin, const Direction& direction):
     _pin(pin), _direction(direction)
