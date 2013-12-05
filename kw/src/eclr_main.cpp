@@ -101,7 +101,7 @@ public:
 
 MyPcosCB myPcosCB;
 //liyamin end
-extern "C" int main(int argc, char* argv[] )
+extern "C" int _main(int argc, char* argv[] )
 {
     argc = argc;
     argv = argv;

@@ -103,7 +103,7 @@ int getDNS(vector<string>& dns)
     return 0;
 }
 
-int setIP(string method, string ip, string mask, string gateway)
+int setIP(const string& method, const string& ip, const string& mask, const string& gateway)
 {
     DBus::default_dispatcher = & dispatcher;
     DBus::Connection bus = DBus::Connection::SystemBus();

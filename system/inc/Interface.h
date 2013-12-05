@@ -22,12 +22,26 @@ static const uint32_t SHARE_MEMORY_DI_LEN             = 512;
 static const uint16_t SHARE_MEMORY_AI_LEN             = 2048 / 2;
 static const uint32_t SHARE_MEMORY_INPUT_REAL_LEN     = 512 / 4; 
 static const uint32_t SHARE_MEMORY_DO_LEN             = 512; 
-static const uint16_t SHARE_MEMORY_AO_LEN             = 512 / 2; 
+static const uint32_t SHARE_MEMORY_AO_LEN             = 512 / 2; 
 static const uint32_t SHARE_MEMORY_RESERVED_LEN       = 128 + 1024 + 1024; 
 static const uint32_t SHARE_MEMORY_SYSTEM_LEN         = 2048 / 2; 
 static const uint32_t SHARE_MEMORY_IO_CONFIG_LEN      = 2048 / 2; 
 static const uint32_t SHARE_MEMORY_MODBUS_BYTE_LEN    = 256; 
 static const uint32_t SHARE_MEMORY_MODBUS_WORD_LEN    = 4096 / 2; 
+
+#pragma pack(1)
+typedef struct {
+    uint8_t ip_section_1;
+    uint8_t ip_section_2;
+    uint8_t ip_section_3;
+    uint8_t ip_section_4;
+} ip_struct_t;
+
+#pragma pack(1)
+typedef struct {
+    uint8_t channel_type;
+    uint8_t channel_num;
+} io_config_t;
 
 #pragma pack(1)
 typedef struct {
@@ -47,10 +61,10 @@ typedef struct {
     uint8_t  set_mon;
     uint8_t  set_time_flag;
     uint16_t set_year;
-    uint32_t set_ip;
-    uint32_t set_subnet_mask;
-    uint32_t set_gateway;
-    uint32_t set_dns;
+    ip_struct_t set_ip;
+    ip_struct_t set_subnet_mask;
+    ip_struct_t set_gateway;
+    ip_struct_t set_dns;
     uint8_t  set_ip_flag;
     uint8_t  io_update_type;
     uint8_t  io_update_period;
@@ -72,7 +86,7 @@ typedef union {
         uint16_t output_ao[SHARE_MEMORY_AO_LEN];
         uint8_t  reserved[SHARE_MEMORY_RESERVED_LEN];
         system_area_t system_area;
-        uint16_t io_config[SHARE_MEMORY_IO_CONFIG_LEN];
+        io_config_t io_config[SHARE_MEMORY_IO_CONFIG_LEN];
         uint8_t  modbus_byte[SHARE_MEMORY_MODBUS_BYTE_LEN];
         uint16_t modbus_word[SHARE_MEMORY_MODBUS_WORD_LEN];
     } user;

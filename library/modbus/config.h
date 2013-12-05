@@ -9,7 +9,7 @@
 
 /* Define to 1 if you have the declaration of `TIOCM_RTS', and to 0 if you
    don't. */
-#define HAVE_DECL_TIOCM_RTS 1
+#define HAVE_DECL_TIOCM_RTS 0
 
 /* Define to 1 if you have the declaration of `TIOCSRS485', and to 0 if you
    don't. */
