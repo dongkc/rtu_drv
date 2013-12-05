@@ -36,14 +36,25 @@ IF (PCRE_LIBRARY)
     TARGET_LINK_LIBRARIES(rtu_driver ${PCRE_LIBRARY})
 ENDIF(PCRE_LIBRARY)
 
-TARGET_LINK_LIBRARIES(rtu_driver modbus pthread
-    dbus-1
-    dbus-c++-1
-    netconfig
-    web
+FIND_LIBRARY(DBUSCPP_LIBRARY NAMES "libdbus-c++-1.a" PATHS ${CMAKE_FIND_ROOT_PATH})
+IF (DBUSCPP_LIBRARY) 
+    TARGET_LINK_LIBRARIES(rtu_driver ${DBUS_LIBRARY})
+ENDIF(DBUSCPP_LIBRARY)
+
+FIND_LIBRARY(DBUS_LIBRARY NAMES "libdbus-1.a" PATHS ${CMAKE_FIND_ROOT_PATH})
+IF (DBUS_LIBRARY) 
+    TARGET_LINK_LIBRARIES(rtu_driver ${DBUS_LIBRARY})
+ENDIF(DBUS_LIBRARY)
+
+TARGET_LINK_LIBRARIES(rtu_driver modbus pthread rt
+    #netconfig
+    #web
+    #${DBUSCPP_LIBRARY}
+    #${DBUS_LIBRARY}
     ${POCO_FOUNDATION_LIBRARY}
     ${POCO_NET_LIBRARY})
 
 AUX_SOURCE_DIRECTORY(test TEST_SRC)
 ADD_EXECUTABLE(rtu_driver_test ${TEST_SRC})
-TARGET_LINK_LIBRARIES(rtu_driver_test modbus pthread netconfig web ${POCO_FOUNDATION_LIBRARY})
+TARGET_LINK_LIBRARIES(rtu_driver_test modbus pthread rt ${POCO_FOUNDATION_LIBRARY})
+#TARGET_LINK_LIBRARIES(rtu_driver_test modbus pthread netconfig web ${POCO_FOUNDATION_LIBRARY})

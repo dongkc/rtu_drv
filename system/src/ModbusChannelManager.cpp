@@ -95,7 +95,6 @@ void ModbusChannelManager::init(share_memory_area_t& shm_area)
         if (shm_area.user.io_config[i].channel_type == MODULE_NOT_PRESENT) {
             continue;
         } else {
-#if 1
             DataChannel *data_channel = nullptr;
             switch(shm_area.user.io_config[i].channel_type) {
                 case MODULE_DI_16:
@@ -143,9 +142,7 @@ void ModbusChannelManager::init(share_memory_area_t& shm_area)
                 default:
                     break;
             }
-#endif
         }
-
     }
 }
 

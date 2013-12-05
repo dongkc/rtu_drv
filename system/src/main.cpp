@@ -87,10 +87,10 @@ void setNetworkParas(system_area_t& system_area)
         return;
     }
 
-    setIP("manual", ip, mask, gateway);
-
-    vector<string> dns_vec{dns};
-    setDNS(dns_vec);
+//    setIP("manual", ip, mask, gateway);
+//
+//    vector<string> dns_vec{dns};
+//    setDNS(dns_vec);
 }
 
 extern "C" int main(int argc, const char *argv[])
@@ -109,8 +109,8 @@ extern "C" int main(int argc, const char *argv[])
         modbus_mgr.readAll();
         modbus_mgr.transfer();
         modbus_mgr.writeAll();
-        //updateTime(shm_ptr->user.system_area);
-        //setTime(shm_ptr->user.system_area);
+        updateTime(shm_ptr->user.system_area);
+        setTime(shm_ptr->user.system_area);
         usleep(10* 1000);
     }
 }
