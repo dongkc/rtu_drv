@@ -37,9 +37,26 @@ typedef struct {
     uint8_t ip_section_4;
 } ip_struct_t;
 
+typedef enum {
+    MODULE_NOT_PRESENT = 0,
+
+    MODULE_DI_16 = 1,
+    MODULE_DO_16 = 2,
+    MODULE_AI_16 = 3,
+    MODULE_AO_08 = 4,
+    MODULE_PI_08 = 5,
+    MODULE_DI_32 = 6,
+    MODULE_DO_32 = 7,
+    MODULE_AI_32 = 8,
+    MODULE_DAIO_32 = 9,
+    MODBUS_RTU_CM = 10,
+
+    MODULE_TYPE_DONE = 255
+} module_type_t;
+
 #pragma pack(1)
 typedef struct {
-    uint8_t channel_type;
+    module_type_t channel_type;
     uint8_t channel_num;
 } io_config_t;
 

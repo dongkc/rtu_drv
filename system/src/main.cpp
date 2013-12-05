@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include "Interface.h"
 #include "net_config.h"
+#include "ModbusChannelManager.h"
 
 using namespace std;
 using namespace boost;
@@ -100,8 +101,15 @@ extern "C" int main(int argc, const char *argv[])
 
     share_memory_area_t* shm_ptr = new (mem.begin()) share_memory_area_t;
 
+    ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, 'N', 8, 1);
+
+    modbus_mgr.init(*shm_ptr);
+
     while (1) {
-        updateTime(shm_ptr->user.system_area);
+        modbus_mgr.readAll();
+        modbus_mgr.transfer();
+        modbus_mgr.writeAll();
+        //updateTime(shm_ptr->user.system_area);
         //setTime(shm_ptr->user.system_area);
         usleep(10* 1000);
     }

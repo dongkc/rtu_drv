@@ -16,7 +16,7 @@ extern uint8_t  output_buf[32];
 void bsp_init(void) {
 
     ctx = modbus_new_rtu("/dev/ttyS1", 115200, 'N', 8, 1);
-    //modbus_set_debug(ctx, TRUE);
+    modbus_set_debug(ctx, TRUE);
 #if 0
     modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_DOWN);
     modbus_set_error_recovery(ctx,

@@ -23,30 +23,15 @@ class  DataChannel
 {
 public:
     DataChannel(uint8_t id,
-            uint8_t di_len = 0,
-            uint8_t do_len = 0,
-            uint8_t ai_len = 0,
-            uint8_t ao_len = 0,
-            uint8_t* di_sink,
-            uint8_t* do_sink,
-            uint16_t* ai_sink,
-            uint16_t* ao_sink
-            );
-
-    ~DataChannel();
-
-    void readDI();
-
-    void readAI();
-
-    void writeDO();
-
-    void writeAO();
-
-    void setSlaveID(uint8_t id);
-
-    uint8_t getSlaveID();
-
+                uint8_t di_len,
+                uint8_t do_len,
+                uint8_t ai_len,
+                uint8_t ao_len,
+                uint8_t*  di_sink,
+                uint8_t*  do_sink,
+                uint16_t* ai_sink,
+                uint16_t* ao_sink
+                );
 public:
     std::array<uint8_t,  128>  _di;
     std::array<uint8_t,  128>  _do;
@@ -58,13 +43,15 @@ public:
     uint8_t  _ai_len;
     uint8_t  _ao_len;
 
-    uint8_t* _di_sink;
-    uint8_t* _do_sink;
-    uint8_t* _ai_sink;
-    uint8_t* _do_sink;
+    uint8_t*  _di_sink;
+    uint8_t*  _do_sink;
+    uint16_t* _ai_sink;
+    uint16_t* _ao_sink;
 
     uint8_t _slaveID;
     uint8_t _status;
+
+};
 
 }
 #endif
