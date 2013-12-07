@@ -11,6 +11,9 @@
  *****************************************************************************
  */
 #define __MODBUSCHANNELMANAGER_SRC__
+#include <stdio.h>
+#include <unistd.h>
+
 #include "ModbusChannelManager.h"
 #include "Interface.h"
 #include "DataChannel.h"
@@ -46,25 +49,8 @@ int response_io_status(int address, int nb,
     return offset;
 }
 
-#if 0
-/* Sets many bits from a table of bytes (only the bits between index and
-   index + nb_bits are set) */
-void modbus_set_bits_from_bytes(uint8_t *dest, int index, unsigned int nb_bits,
-                                const uint8_t *tab_byte)
-{
-    unsigned int i;
-    int shift = 0;
-
-    for (i = index; i < index + nb_bits; i++) {
-        dest[i] = tab_byte[(i - index) / 8] & (1 << shift) ? 1 : 0;
-        /* gcc doesn't like: shift = (++shift) % 8; */
-        shift++;
-        shift %= 8;
-    }
 }
 
-#endif
-}
 namespace Zebra {
 ModbusChannelManager::ModbusChannelManager(const char *device,
                          int baud,
@@ -78,7 +64,7 @@ ModbusChannelManager::ModbusChannelManager(const char *device,
     modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
 }
 
-void ModbusChannelManager::init(share_memory_area_t& shm_area)
+void ModbusChannelManager::init(share_memory_area_t* shm_area)
 {
     uint32_t  di_counter = 0;
     uint32_t  ai_counter = 0;
@@ -86,30 +72,31 @@ void ModbusChannelManager::init(share_memory_area_t& shm_area)
     uint32_t  do_counter = 0;
     uint32_t  ao_counter = 0;
 
-    for (uint32_t i = 0; i < SHARE_MEMORY_IO_CONFIG_LEN; ++i) {
-        if (shm_area.user.io_config[i].channel_type == MODULE_TYPE_DONE) {
+    for (uint32_t i = 1; i < SHARE_MEMORY_IO_CONFIG_LEN; ++i) {
+        if (shm_area->user.io_config[i - 1].channel_type == MODULE_TYPE_DONE) {
             //TODO
-            return;
+            printf(" test %d\n", i);
+            break;
         }
 
-        if (shm_area.user.io_config[i].channel_type == MODULE_NOT_PRESENT) {
+        if (shm_area->user.io_config[i - 1].channel_type == MODULE_NOT_PRESENT) {
             continue;
         } else {
             DataChannel *data_channel = nullptr;
-            switch(shm_area.user.io_config[i].channel_type) {
+            switch(shm_area->user.io_config[i - 1].channel_type) {
                 case MODULE_DI_16:
                     data_channel = new DataChannel(i,
                                                    16,
                                                    0,
                                                    0,
                                                    0,
-                                                   &shm_area.user.input_di[di_counter],
+                                                   &shm_area->user.input_di[di_counter],
                                                    nullptr,
                                                    nullptr,
                                                    nullptr);
                     vec.push_back(data_channel);
 
-                    di_counter +=16;
+                    di_counter += 2;
                     break;
                 case MODULE_DO_16:
                     data_channel = new DataChannel(i,
@@ -118,12 +105,12 @@ void ModbusChannelManager::init(share_memory_area_t& shm_area)
                                                    0,
                                                    0,
                                                    nullptr,
-                                                   &shm_area.user.output_do[do_counter],
+                                                   &shm_area->user.output_do[do_counter],
                                                    nullptr,
                                                    nullptr);
                     vec.push_back(data_channel);
 
-                    do_counter +=16;
+                    do_counter += 2;
                     break;
                 case MODULE_AI_16:
                     data_channel = new DataChannel(i,
@@ -133,12 +120,30 @@ void ModbusChannelManager::init(share_memory_area_t& shm_area)
                                                    0,
                                                    nullptr,
                                                    nullptr,
-                                                   &shm_area.user.input_ai[ai_counter],
+                                                   &shm_area->user.input_ai[ai_counter],
                                                    nullptr);
                     vec.push_back(data_channel);
 
                     ai_counter +=16;
                     break;
+
+                case MODULE_DAIO_32:
+                    data_channel = new DataChannel(i,
+                                                   8,
+                                                   8,
+                                                   8,
+                                                   0,
+                                                   &shm_area->user.input_di[di_counter],
+                                                   &shm_area->user.output_do[do_counter],
+                                                   &shm_area->user.input_ai[ai_counter],
+                                                   nullptr);
+                    vec.push_back(data_channel);
+
+                    di_counter += 1;
+                    do_counter += 1;
+                    ai_counter += 8;
+                    break;
+
                 default:
                     break;
             }
@@ -161,7 +166,7 @@ void ModbusChannelManager::readAll()
             rc = modbus_read_input_registers(ctx, 0, channel->_ai_len, channel->_ai.data());
         }
 
-        if (rc != 0) {
+        if (rc == -1) {
             channel->_status = 0;
         } else {
             channel->_status = 1;
@@ -185,7 +190,7 @@ void ModbusChannelManager::writeAll()
             rc = modbus_write_registers(ctx, 0, channel->_ao_len, channel->_ao.data());
         }
 
-        if (rc != 0) {
+        if (rc == -1) {
             channel->_status = 0;
         } else {
             channel->_status = 1;
@@ -202,7 +207,17 @@ ModbusChannelManager::~ModbusChannelManager()
     }
 }
 
-void ModbusChannelManager::transfer()
+void ModbusChannelManager::reconfig(share_memory_area_t* shm_area)
+{
+    for (auto channel : vec) {
+        delete channel;
+    }
+
+    vec.clear();
+
+    init(shm_area);
+}
+void ModbusChannelManager::transferReadData()
 {
     for (auto channel : vec) {
         if (channel->_di_sink) {
@@ -220,9 +235,14 @@ void ModbusChannelManager::transfer()
                 dest_ptr++;
             }
         }
+    }
+}
 
+void ModbusChannelManager::transferWriteData()
+{
+    for (auto channel : vec) {
         if (channel->_do_sink) {
-            modbus_set_bits_from_bytes(channel->_do.data(),
+           modbus_set_bits_from_bytes(channel->_do.data(),
                                       0,
                                       channel->_do_len,
                                       channel->_do_sink);
@@ -237,10 +257,22 @@ void ModbusChannelManager::transfer()
         }
     }
 }
-
 void ModbusChannelManager::setSlaveId(uint8_t address)
 {
     modbus_set_slave(ctx, address);
+    usleep(2000);
+}
+
+void ModbusChannelManager::debug()
+{
+    for (auto channel : vec) {
+        printf("-----------------------\n");
+        printf("address: %d\n", channel->_slaveID);
+        printf("     di: %d\n", channel->_di_len);
+        printf("     ai: %d\n", channel->_ai_len);
+        printf("     do: %d\n", channel->_do_len);
+        printf("     ai: %d\n", channel->_ao_len);
+    }
 }
 
 }

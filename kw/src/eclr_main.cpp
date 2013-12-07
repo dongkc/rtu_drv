@@ -8,11 +8,14 @@
 #include "eclrEnvironment.h"
 #include "eclr.h"
 
+#include <Poco/SharedMemory.h>
+
 #include "CONSEN_SHM.h"
 #include "GT_LIB10.h"
 #include "CONSEN_IO.h"
 //liyamin_begin
 unsigned char SHM_Buff_SYS[65535];
+//unsigned char* SHM_Buff_SYS = NULL;
 uint8 g_retain[100];
 //liyamin end
 #define STACK_BASE_SYS      PTHREAD_STACK_MIN + 0x8000
@@ -101,7 +104,8 @@ public:
 
 MyPcosCB myPcosCB;
 //liyamin end
-extern "C" int _main(int argc, char* argv[] )
+
+extern "C" int main(int argc, char* argv[] )
 {
     argc = argc;
     argv = argv;
@@ -111,7 +115,7 @@ extern "C" int _main(int argc, char* argv[] )
     printf("KW-Software embedded CLR Version %s for Linux.ARM\n", ECLR_VERSION_STRING);
 
 #ifdef PLATFORM_THREADING_SUPPORT
-	 setPriorityScheme();        
+	 //setPriorityScheme();        
 #endif	 
 
     if (ClrController::Create("Default", loc_object_heap, sizeof(loc_object_heap)) == NULL)
@@ -126,8 +130,8 @@ extern "C" int _main(int argc, char* argv[] )
     pDeviceInfo->setAttribute(CDeviceInfo::HardwareVersion, "1.0");
     pDeviceInfo->setAttribute(CDeviceInfo::FirmwareVersion, "1.0");
     pDeviceInfo->setAttribute(CDeviceInfo::MaxApplRetainDataSize, (uint32)0);
-    pDeviceInfo->setAttribute(CDeviceInfo::TimerResolution, 1000);
-    pDeviceInfo->setAttribute(CDeviceInfo::ScheduleInterval, 1000);
+//  pDeviceInfo->setAttribute(CDeviceInfo::TimerResolution, 1000);
+//    pDeviceInfo->setAttribute(CDeviceInfo::ScheduleInterval, 1000);
 
     //ClrAppDomain* pAppDomain = ClrController::CreateDomain("Default", ClrAppDomain::CreationDefault);
     ClrAppDomain* pAppDomain = ClrController::CreateDomain("Default", ClrAppDomain::DownloadChangeSupport);
@@ -148,7 +152,7 @@ extern "C" int _main(int argc, char* argv[] )
     }
 
 #ifdef PLATFORM_THREADING_SUPPORT
-	 pPcosDomain->SetTicksPerSecond(0); // scheduler is working with time base of EclrEnvironment        
+	 //pPcosDomain->SetTicksPerSecond(0); // scheduler is working with time base of EclrEnvironment        
 #endif	
 	
 #if 0
@@ -161,20 +165,20 @@ extern "C" int _main(int argc, char* argv[] )
     // set the application retentive memory space (simulated by volatile ram)
     pPcosDomain->AnnounceRetentiveMemory(&g_retain, sizeof(g_retain));
     // set a specific ProConOS callback to handle ProConOS state changes
-    pPcosDomain->setCallback(&myPcosCB);
+    //pPcosDomain->setCallback(&myPcosCB);
 //liyamin end
 
 //LIYAMIN_BEGIN
 	//function library loading
-	GT_LIB10::init();
-	GT_LIB10::loadLibrary();
-	//share memory loading
-	CONSEN_SHM::init();
-	CONSEN_SHM::loadLibrary();
-			
-	//driver library loading
-	CONSEN_IO::init();
-	CONSEN_IO::loadLibrary();		
+//	GT_LIB10::init();
+//	GT_LIB10::loadLibrary();
+//	//share memory loading
+//	CONSEN_SHM::init();
+//	CONSEN_SHM::loadLibrary();
+//			
+//	//driver library loading
+//	CONSEN_IO::init();
+//	CONSEN_IO::loadLibrary();		
 //LIYAMIN END//
 		
     // pPcosDomain->WarmStartBootReq();

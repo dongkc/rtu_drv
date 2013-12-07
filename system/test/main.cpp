@@ -18,6 +18,7 @@
 #include <Poco/DateTime.h>
 #include <ctime>
 #include <sys/time.h>
+#include <sys/shm.h>
 #include <unistd.h>
 #include <boost/lexical_cast.hpp>
 #include <stdio.h>
@@ -71,19 +72,58 @@ void debugTime(share_memory_area_t* shm_ptr)
     printf("run_ms\t\t%d\n"    ,shm_ptr->user.system_area.run_ms  ); 
 }
 
+unsigned char *fnShareMemory()
+{	key_t key;
+	int shm_id;
+	char pathname[255];
+	strcpy(pathname,"/tmps") ;
+	key = ftok(pathname,0x03);
+	if(key==-1)
+	{
+		printf("ftok error");
+	}
+	printf("key=%d\n",key) ;
+	shm_id=shmget(key,65536,IPC_CREAT|IPC_EXCL|0600);
+	
+	if(shm_id==-1)
+	{
+		printf("shmget error");
+		shm_id=shmget(key,0,0);
+
+	}
+	printf("shm_id%d\n",shm_id) ;
+	printf("shm_id=%d\n", shm_id) ;
+	unsigned char* SHM_Buff_SYS =(unsigned char*)shmat(shm_id,NULL,0);
+    return SHM_Buff_SYS;
+
+}
+
 extern "C" int main(int argc, const char *argv[])
 {
-    SharedMemory mem("ConsenShareMemory",
+#if 0
+    SharedMemory mem("/tmp",
                       SHARE_MEMORY_TOTAL_LENGTH,
                       SharedMemory::AM_WRITE);
 
     share_memory_area_t* shm_ptr = new (mem.begin()) share_memory_area_t;
+#endif
 
+    unsigned char *raw_shm_ptr = fnShareMemory();
+    //share_memory_area_t* shm_ptr = new (mem.begin()) share_memory_area_t;
+    share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
+
+
+    printf("size of shm : %d\n", sizeof(shm_ptr->user.system_area));
     while (1) {
+
+    shm_ptr->user.output_do[0] = 0xFF;
+    shm_ptr->user.output_do[1] = 0xFF;
+    shm_ptr->user.output_do[1] = 0xFF;
+    shm_ptr->user.output_do[3] = 0xFF;
+
         debugTime(shm_ptr);
         usleep(1000* 1000);
     }
 }
-
 
 }  //  namespace Zebra

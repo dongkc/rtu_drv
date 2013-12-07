@@ -117,7 +117,6 @@ enum {
 #define EMBBADEXC  (EMBXGTAR + 3)
 #define EMBUNKEXC  (EMBXGTAR + 4)
 #define EMBMDATA   (EMBXGTAR + 5)
-#define EMBBADSLAVE (EMBXGTAR + 6)
 
 extern const unsigned int libmodbus_version_major;
 extern const unsigned int libmodbus_version_minor;

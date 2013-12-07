@@ -14,7 +14,9 @@
 /****************************************************************************/
 /**                             MODULES USED                               **/
 /****************************************************************************/
-#include <iostream>
+#include <sys/shm.h>
+#include <string>
+#include <fstream>
 #include <Poco/SharedMemory.h>
 #include <Poco/DateTime.h>
 #include <Poco/Net/IPAddress.h>
@@ -87,31 +89,123 @@ void setNetworkParas(system_area_t& system_area)
         return;
     }
 
-//    setIP("manual", ip, mask, gateway);
-//
-//    vector<string> dns_vec{dns};
-//    setDNS(dns_vec);
+#if 0
+    setIP("manual", ip, mask, gateway);
+
+    vector<string> dns_vec{dns};
+    setDNS(dns_vec);
+#endif
+}
+
+unsigned char *fnShareMemory()
+{	key_t key;
+	int shm_id;
+	char pathname[255];
+	strcpy(pathname,"/tmps") ;
+	key = ftok(pathname,0x03);
+	if(key==-1)
+	{
+		printf("ftok error");
+	}
+	printf("key=%d\n",key) ;
+	shm_id=shmget(key,65536,IPC_CREAT|IPC_EXCL|0600);
+	
+	if(shm_id==-1)
+	{
+		printf("shmget error");
+		shm_id=shmget(key,0,0);
+
+	}
+	printf("shm_id%d\n",shm_id) ;
+	printf("shm_id=%d\n", shm_id) ;
+	unsigned char* SHM_Buff_SYS =(unsigned char*)shmat(shm_id,NULL,0);
+    return SHM_Buff_SYS;
+
 }
 
 extern "C" int main(int argc, const char *argv[])
 {
-    SharedMemory mem("ConsenShareMemory",
+#if 0
+    SharedMemory mem("/tmp",
                       SHARE_MEMORY_TOTAL_LENGTH,
                       SharedMemory::AM_WRITE);
+#endif
 
-    share_memory_area_t* shm_ptr = new (mem.begin()) share_memory_area_t;
+    unsigned char *raw_shm_ptr = fnShareMemory();
+    //share_memory_area_t* shm_ptr = new (mem.begin()) share_memory_area_t;
+    share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
 
     ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, 'N', 8, 1);
 
-    modbus_mgr.init(*shm_ptr);
+//    printf("%p %p\n", &shm_ptr->user.io_config, &shm_ptr->share_memory[8320]);
+#if 0
+    for (int i = 0; i < 100; ++i) {
+        printf("%d, %d, %p\n", i, shm_ptr->share_memory[8320 + i], &shm_ptr->share_memory[8320 + i]);
+    }
+#endif
+
+    shm_ptr->user.io_config[1].channel_type = 9;
+    shm_ptr->user.io_config[2].channel_type = 9;
+    shm_ptr->user.io_config[3].channel_type = 9;
+    shm_ptr->user.io_config[4].channel_type = 9;
+    shm_ptr->user.io_config[5].channel_type = 255;
+
+    shm_ptr->user.output_do[0] = 0xFF;
+    shm_ptr->user.output_do[1] = 0xFF;
+    shm_ptr->user.output_do[2] = 0xFF;
+    shm_ptr->user.output_do[3] = 0xFF;
+
+    modbus_mgr.init(shm_ptr);
+
+    system_area_t& system_area = shm_ptr->user.system_area;
 
     while (1) {
-        modbus_mgr.readAll();
-        modbus_mgr.transfer();
-        modbus_mgr.writeAll();
-        updateTime(shm_ptr->user.system_area);
-        setTime(shm_ptr->user.system_area);
-        usleep(10* 1000);
+
+#if 0
+    for (int i = 0; i < 10; ++i) {
+        printf("%d, %d, %p\n", i, shm_ptr->share_memory[3072 + i], &shm_ptr->share_memory[3072 + i]);
+    }
+#endif
+        if (system_area.io_update_config == 1) {
+            printf("=======================\n");
+            modbus_mgr.reconfig(shm_ptr);
+            system_area.io_update_config = 0;
+        }
+
+        //modbus_mgr.debug();
+        system_area.io_update_type = 1;
+        switch (system_area.io_update_type) {
+            case 1:
+                modbus_mgr.readAll();
+                modbus_mgr.transferReadData();
+
+                modbus_mgr.transferWriteData();
+                modbus_mgr.writeAll();
+                break;
+
+            case 2:
+                modbus_mgr.readAll();
+                while (system_area.io_update_read_cmd != 1);
+                modbus_mgr.transferReadData();
+                system_area.io_update_read_cmd = 0;
+
+                while (system_area.io_update_write_cmd != 1);
+                modbus_mgr.transferWriteData();
+                system_area.io_update_write_cmd = 0;
+                modbus_mgr.writeAll();
+                break;
+
+            default:
+                break;
+        }
+
+        if (system_area.set_time_flag == 255) {
+            setTime(system_area);
+            system_area.set_time_flag = 0;
+        }
+        updateTime(system_area);
+
+        usleep(1000 * (system_area.io_update_period > 0 ? system_area.io_update_period : 2));
     }
 }
 

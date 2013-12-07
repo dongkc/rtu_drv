@@ -160,7 +160,7 @@ void bsp_output_update(void) {
 #endif
 }
 
-int main(int argc, const char *argv[])
+int _main(int argc, const char *argv[])
 {
     int i;
     int n = 0;

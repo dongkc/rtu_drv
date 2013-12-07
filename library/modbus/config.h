@@ -1,15 +1,8 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you have the `accept4' function. */
-#define HAVE_ACCEPT4 1
-
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define HAVE_ARPA_INET_H 1
-
-/* Define to 1 if you have the declaration of `TIOCM_RTS', and to 0 if you
-   don't. */
-#define HAVE_DECL_TIOCM_RTS 0
 
 /* Define to 1 if you have the declaration of `TIOCSRS485', and to 0 if you
    don't. */
@@ -141,7 +134,7 @@
 #define PACKAGE_NAME "libmodbus"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libmodbus 3.1.0"
+#define PACKAGE_STRING "libmodbus 3.0.5"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libmodbus"
@@ -150,7 +143,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.1.0"
+#define PACKAGE_VERSION "3.0.5"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -159,7 +152,7 @@
 #define TIME_WITH_SYS_TIME 1
 
 /* Version number of package */
-#define VERSION "3.1.0"
+#define VERSION "3.0.5"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

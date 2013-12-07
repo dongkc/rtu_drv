@@ -31,7 +31,7 @@ void modbus_set_bits_from_byte(uint8_t *dest, int index, const uint8_t value)
 {
     int i;
 
-    for (i=0; i < 8; i++) {
+    for (i=0; i<8; i++) {
         dest[index+i] = (value & (1 << i)) ? 1 : 0;
     }
 }
@@ -41,7 +41,7 @@ void modbus_set_bits_from_byte(uint8_t *dest, int index, const uint8_t value)
 void modbus_set_bits_from_bytes(uint8_t *dest, int index, unsigned int nb_bits,
                                 const uint8_t *tab_byte)
 {
-    unsigned int i;
+    int i;
     int shift = 0;
 
     for (i = index; i < index + nb_bits; i++) {
@@ -57,7 +57,7 @@ void modbus_set_bits_from_bytes(uint8_t *dest, int index, unsigned int nb_bits,
 uint8_t modbus_get_byte_from_bits(const uint8_t *src, int index,
                                   unsigned int nb_bits)
 {
-    unsigned int i;
+    int i;
     uint8_t value = 0;
 
     if (nb_bits > 8) {
@@ -76,7 +76,7 @@ uint8_t modbus_get_byte_from_bits(const uint8_t *src, int index,
 /* Get a float from 4 bytes in Modbus format */
 float modbus_get_float(const uint16_t *src)
 {
-    float f;
+    float f = 0.0f;
     uint32_t i;
 
     i = (((uint32_t)src[1]) << 16) + src[0];
@@ -88,7 +88,7 @@ float modbus_get_float(const uint16_t *src)
 /* Set a float to 4 bytes in Modbus format */
 void modbus_set_float(float f, uint16_t *dest)
 {
-    uint32_t i;
+    uint32_t i = 0;
 
     memcpy(&i, &f, sizeof(uint32_t));
     dest[0] = (uint16_t)i;

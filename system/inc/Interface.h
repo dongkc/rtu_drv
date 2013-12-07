@@ -25,7 +25,7 @@ static const uint32_t SHARE_MEMORY_DO_LEN             = 512;
 static const uint32_t SHARE_MEMORY_AO_LEN             = 512 / 2; 
 static const uint32_t SHARE_MEMORY_RESERVED_LEN       = 128 + 1024 + 1024; 
 static const uint32_t SHARE_MEMORY_SYSTEM_LEN         = 2048 / 2; 
-static const uint32_t SHARE_MEMORY_IO_CONFIG_LEN      = 2048 / 2; 
+static const uint32_t SHARE_MEMORY_IO_CONFIG_LEN      = 256 / 2; 
 static const uint32_t SHARE_MEMORY_MODBUS_BYTE_LEN    = 256; 
 static const uint32_t SHARE_MEMORY_MODBUS_WORD_LEN    = 4096 / 2; 
 
@@ -56,7 +56,7 @@ typedef enum {
 
 #pragma pack(1)
 typedef struct {
-    module_type_t channel_type;
+    uint8_t channel_type;
     uint8_t channel_num;
 } io_config_t;
 
@@ -76,20 +76,20 @@ typedef struct {
     uint8_t  set_hour;
     uint8_t  set_day;
     uint8_t  set_mon;
-    uint8_t  set_time_flag;
     uint16_t set_year;
+    uint8_t  set_time_flag;
     ip_struct_t set_ip;
     ip_struct_t set_subnet_mask;
     ip_struct_t set_gateway;
     ip_struct_t set_dns;
     uint8_t  set_ip_flag;
     uint8_t  io_update_type;
-    uint8_t  io_update_period;
+    uint16_t io_update_period;
     uint8_t  io_update_read_cmd;
     uint8_t  io_update_write_cmd;
-
-    uint8_t  reserved_area[983];
-    uint8_t  modules_health_flag[1024];
+    uint8_t  io_update_config;
+    uint8_t  modules_health_flag[256];
+    uint8_t  reserved_area[1741];
 } system_area_t;
 
 #pragma pack(1)
