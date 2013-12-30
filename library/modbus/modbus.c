@@ -193,10 +193,12 @@ static int send_msg(modbus_t *ctx, uint8_t *msg, int msg_length)
     } while ((ctx->error_recovery & MODBUS_ERROR_RECOVERY_LINK) &&
              rc == -1);
 
+#if 0
     if (rc > 0 && rc != msg_length) {
         errno = EMBBADDATA;
         return -1;
     }
+#endif
 
     return rc;
 }

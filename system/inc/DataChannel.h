@@ -13,6 +13,7 @@
 #ifndef __DATACHANNEL_HEADER__
 #define __DATACHANNEL_HEADER__
 #include <array>
+#include <stdint.h>
 
 namespace Zebra {
 

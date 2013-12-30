@@ -10,11 +10,11 @@ class Http: public Poco::Util::Subsystem {
         Http();
         ~Http();
 
-        const char* name() const override;
+        const char* name() const;
 
     protected:
-        void initialize(Poco::Util::Application& app) override;
-        void uninitialize() override;
+        void initialize(Poco::Util::Application& app);
+        void uninitialize();
 
     private:
         Poco::Net::HTTPServer* _httpServer;

@@ -60,9 +60,16 @@ typedef struct {
     uint8_t channel_num;
 } io_config_t;
 
+typedef enum {
+    MODULE_DISCONNECT = 0,
+    MODULE_OK = 1,
+    MODULE_INTERNAL_ERROR = 2,
+    MODULE_NOT_FOUND = 255
+} module_status_t;
+
 #pragma pack(1)
 typedef struct {
-    uint64_t run_time; /// run time, unit is 0.1 ms
+    uint64_t up_time; /// run time, unit is 0.1 ms
     uint32_t run_ms;
     uint8_t  run_sec;
     uint8_t  run_min;

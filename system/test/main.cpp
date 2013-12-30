@@ -63,6 +63,7 @@ void setTime(share_memory_area_t* shm_ptr)
 void debugTime(share_memory_area_t* shm_ptr)
 {
     printf("=====================================================\n");
+    printf("up_time\t%lld\n" ,shm_ptr->user.system_area.up_time); 
     printf("run_year\t%d\n" ,shm_ptr->user.system_area.run_year); 
     printf("run_mon\t\t%d\n"   ,shm_ptr->user.system_area.run_mon ); 
     printf("run_day\t\t%d\n"   ,shm_ptr->user.system_area.run_day ); 
@@ -76,7 +77,7 @@ unsigned char *fnShareMemory()
 {	key_t key;
 	int shm_id;
 	char pathname[255];
-	strcpy(pathname,"/tmps") ;
+	strcpy(pathname,"/tmp") ;
 	key = ftok(pathname,0x03);
 	if(key==-1)
 	{
@@ -100,14 +101,6 @@ unsigned char *fnShareMemory()
 
 extern "C" int main(int argc, const char *argv[])
 {
-#if 0
-    SharedMemory mem("/tmp",
-                      SHARE_MEMORY_TOTAL_LENGTH,
-                      SharedMemory::AM_WRITE);
-
-    share_memory_area_t* shm_ptr = new (mem.begin()) share_memory_area_t;
-#endif
-
     unsigned char *raw_shm_ptr = fnShareMemory();
     //share_memory_area_t* shm_ptr = new (mem.begin()) share_memory_area_t;
     share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
@@ -115,11 +108,6 @@ extern "C" int main(int argc, const char *argv[])
 
     printf("size of shm : %d\n", sizeof(shm_ptr->user.system_area));
     while (1) {
-
-    shm_ptr->user.output_do[0] = 0xFF;
-    shm_ptr->user.output_do[1] = 0xFF;
-    shm_ptr->user.output_do[1] = 0xFF;
-    shm_ptr->user.output_do[3] = 0xFF;
 
         debugTime(shm_ptr);
         usleep(1000* 1000);

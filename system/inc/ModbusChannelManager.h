@@ -28,14 +28,23 @@ public:
                          char parity,
                          int data_bit,
                          int stop_bit);
+
     ~ModbusChannelManager();
+
     void init(share_memory_area_t* shm_area);
+
     void readAll();
+
     void writeAll();
+
     void setSlaveId(uint8_t address);
+
     void transferWriteData();
+
     void transferReadData();
+
     void debug();
+
     void reconfig(share_memory_area_t* shm_area);
 
 private:
