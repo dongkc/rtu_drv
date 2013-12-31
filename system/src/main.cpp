@@ -177,7 +177,7 @@ extern "C" int main(int argc, const char *argv[])
     share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
     //setRealTime();
 
-    ModbusChannelManager modbus_mgr("/dev/ttyS4", 115200, 'N', 8, 1);
+    ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, 'N', 8, 1);
 
 #if 1
     shm_ptr->user.io_config[1].channel_type = 9;
