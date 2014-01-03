@@ -330,7 +330,7 @@ void ModbusChannelManager::transferWriteData()
 void ModbusChannelManager::setSlaveId(uint8_t address)
 {
     modbus_set_slave(ctx, address);
-    //usleep(5000);
+    usleep(5000);
 }
 
 void ModbusChannelManager::debug()

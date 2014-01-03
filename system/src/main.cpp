@@ -33,6 +33,7 @@
 #include "net_config.h"
 #include "ModbusChannelManager.h"
 #include "lym_RT01.h"
+#include "Consen.h"
 
 using namespace std;
 using namespace boost;
@@ -175,7 +176,12 @@ extern "C" int main(int argc, const char *argv[])
 {
     unsigned char *raw_shm_ptr = fnShareMemory();
     share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
-    //setRealTime();
+
+    ConsenComManager consen_mgr("/home/consen/comcfg.dat",
+                                "/home/consen/comtask.dat");
+    consen_mgr.init();
+    consen_mgr.start(shm_ptr->user.modbus_byte,
+                     shm_ptr->user.modbus_word);
 
     ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, 'N', 8, 1);
 

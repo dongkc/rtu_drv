@@ -20,7 +20,7 @@
 
 typedef struct {
     uint8_t  id;
-    uint16_t baud;
+    uint32_t baud;
     uint8_t  parity;
     uint8_t  data_bit;
     uint8_t  stop_bit;
@@ -110,6 +110,12 @@ private:
     bool parseCom();
 
     bool parseTask();
+
+    void debug();
+
+    bool validate(const consen_com_cfg_t&);
+
+    bool validate(const consen_task_cfg_t&);
 
 private:
     std::string _com_cfg_file;
