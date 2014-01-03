@@ -200,7 +200,7 @@ extern "C" int main(int argc, const char *argv[])
 {
     unsigned char *raw_shm_ptr = fnShareMemory();
     share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
-    memset(shm_ptr, 0, sizeof(share_memory_area_t));
+    //memset(shm_ptr, 0, sizeof(share_memory_area_t));
 
     log_init();
 
