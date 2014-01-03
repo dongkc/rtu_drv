@@ -15,8 +15,10 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <Poco/StringTokenizer.h>
-#include <Poco/ThreadPool.h>
 #include <Poco/Runnable.h>
+#include <Poco/Logger.h>
+#include <Poco/FileChannel.h>
+#include <Poco/AutoPtr.h>
 
 using namespace std;
 using namespace Poco;
@@ -56,7 +58,10 @@ ConsenComManager::ConsenComManager(const string& com_cfg_file,
     : _com_cfg_file(com_cfg_file),
       _task_cfg_file(task_cfg_file),
       _consen_com_1(nullptr),
-      _consen_com_2(nullptr)
+      _consen_com_2(nullptr),
+      _thread_com1("com1"),
+      _thread_com2("com2"),
+      _logger(Poco::Logger::get("ConsenComManager"))
 {
 }
 
@@ -64,6 +69,9 @@ void ConsenComManager::init()
 {
     parseCom();
     parseTask();
+
+    _thread_com1.setOSPriority(90, SCHED_RR);
+    _thread_com2.setOSPriority(90, SCHED_RR);
 }
 
 void ConsenComManager::debug()
@@ -80,6 +88,17 @@ void ConsenComManager::debug()
     }
 
     for (auto task : _task_vec_1) {
+        printf("com_id %d task_id %d slave_id %d cmd_id %d addr %d data_num %d offset %d\n",
+               task.com_id,
+               task.task_id,
+               task.slave_id,
+               task.cmd_id,
+               task.addr,
+               task.data_num,
+               task.offset);
+    }
+
+    for (auto task : _task_vec_2) {
         printf("com_id %d task_id %d slave_id %d cmd_id %d addr %d data_num %d offset %d\n",
                task.com_id,
                task.task_id,
@@ -112,25 +131,25 @@ void ConsenComManager::start(const uint8_t *modbus_bool_ptr,
     }
 
     debug();
-#if 1
+
     if (!_task_vec_1.empty()) {
-        _consen_com_1 = new ConsenThread(_task_vec_1,
+        _consen_com_1 = new ConsenCom(_task_vec_1,
                                          "/dev/ttyS4",
                                          com1_cfg,
                                          modbus_bool_ptr,
                                          modbus_word_ptr);
-        ThreadPool::defaultPool().start(*_consen_com_1);
+        _thread_com1.start(*_consen_com_1);
     }
 
     if (!_task_vec_2.empty()) {
-        _consen_com_2 = new ConsenThread(_task_vec_2,
+        _consen_com_2 = new ConsenCom(_task_vec_2,
                                          "/dev/ttyS2",
                                          com2_cfg,
                                          modbus_bool_ptr,
                                          modbus_word_ptr);
-        ThreadPool::defaultPool().start(*_consen_com_2);
+        _thread_com2.start(*_consen_com_2);
     }
-#endif
+
 }
 
 bool ConsenComManager::parseCom()
@@ -141,16 +160,24 @@ bool ConsenComManager::parseCom()
     while (getline(com_cfg, s)) {
         StringTokenizer tokens(s, ":", StringTokenizer::TOK_TRIM);
         if (tokens.count() != 6) {
+            poco_warning_f1(_logger, "Invalid com config: %s", s);
             continue;
         }
         
         com_cfg_ptr = new consen_com_cfg_t;
-        com_cfg_ptr->id         = lexical_cast<uint16_t>(tokens[0]);
-        com_cfg_ptr->baud       = lexical_cast<uint32_t>(tokens[1]);
-        com_cfg_ptr->parity     = lexical_cast<uint8_t> (tokens[2]);
-        com_cfg_ptr->data_bit   = lexical_cast<uint16_t>(tokens[3]);
-        com_cfg_ptr->stop_bit   = lexical_cast<uint16_t>(tokens[4]);
-        com_cfg_ptr->period     = lexical_cast<uint16_t>(tokens[5]);
+
+        try {
+            com_cfg_ptr->id         = lexical_cast<uint16_t>(tokens[0]);
+            com_cfg_ptr->baud       = lexical_cast<uint32_t>(tokens[1]);
+            com_cfg_ptr->parity     = lexical_cast<uint8_t> (tokens[2]);
+            com_cfg_ptr->data_bit   = lexical_cast<uint16_t>(tokens[3]);
+            com_cfg_ptr->stop_bit   = lexical_cast<uint16_t>(tokens[4]);
+            com_cfg_ptr->period     = lexical_cast<uint16_t>(tokens[5]);
+        } catch (...) {
+            poco_warning_f1(_logger, "Invalid com config: %s", s);
+            delete com_cfg_ptr;
+            continue;
+        }
 
         _com_vec.push_back(*com_cfg_ptr);
     }
@@ -166,17 +193,25 @@ bool ConsenComManager::parseTask()
     while (getline(task_cfg, s)) {
         StringTokenizer tokens(s, ":", StringTokenizer::TOK_TRIM);
         if (tokens.count() != 7) {
+            poco_warning_f1(_logger, "Invalid task: %s", s);
             continue;
         }
 
         task_cfg_ptr = new consen_task_cfg_t;
-        task_cfg_ptr->com_id     = lexical_cast<uint16_t>(tokens[0]);
-        task_cfg_ptr->task_id    = lexical_cast<uint16_t>(tokens[1]);
-        task_cfg_ptr->slave_id   = lexical_cast<uint16_t>(tokens[2]);
-        task_cfg_ptr->cmd_id     = lexical_cast<uint16_t>(tokens[3]);
-        task_cfg_ptr->addr       = lexical_cast<uint16_t>(tokens[4]);
-        task_cfg_ptr->data_num   = lexical_cast<uint16_t>(tokens[5]);
-        task_cfg_ptr->offset     = lexical_cast<uint16_t>(tokens[6]);
+
+        try {
+            task_cfg_ptr->com_id     = lexical_cast<uint16_t>(tokens[0]);
+            task_cfg_ptr->task_id    = lexical_cast<uint16_t>(tokens[1]);
+            task_cfg_ptr->slave_id   = lexical_cast<uint16_t>(tokens[2]);
+            task_cfg_ptr->cmd_id     = lexical_cast<uint16_t>(tokens[3]);
+            task_cfg_ptr->addr       = lexical_cast<uint16_t>(tokens[4]);
+            task_cfg_ptr->data_num   = lexical_cast<uint16_t>(tokens[5]);
+            task_cfg_ptr->offset     = lexical_cast<uint16_t>(tokens[6]);
+        } catch (...) {
+            poco_warning_f1(_logger, "Invalid task: %s", s);
+            delete task_cfg_ptr;
+            continue;
+        }
 
         switch (task_cfg_ptr->com_id) {
             case 0:
@@ -193,7 +228,7 @@ bool ConsenComManager::parseTask()
     return true;
 }
 
-void ConsenThread::init()
+void ConsenCom::init()
 {
     ctx = modbus_new_rtu(_com_path.c_str(),
                          _com.baud,
@@ -205,28 +240,24 @@ void ConsenThread::init()
     modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
 }
 
-void ConsenThread::setAddr(uint8_t address)
+void ConsenCom::setAddr(uint8_t address)
 {
     modbus_set_slave(ctx, address);
     usleep(5000);
 }
 
-void ConsenThread::poll()
+void ConsenCom::poll()
 {
-    int32_t rc;
     for (auto task : _task_vec) {
         setAddr(task.slave_id);
 
         static uint8_t buf[256];
         switch (task.cmd_id) {
             case MODBUS_READ_DISCRETE_INPUTS:
-                rc = modbus_read_input_bits(ctx,
+                modbus_read_input_bits(ctx,
                                        task.addr,
                                        task.data_num,
                                        buf);
-                if (rc < 0) {
-                    //printf("return code: %d\n", rc);
-                }
                 response_io_status(0,
                                    task.data_num,
                                    buf,
@@ -256,7 +287,7 @@ void ConsenThread::poll()
     }
 }
 
-void ConsenThread::run()
+void ConsenCom::run()
 {
     init();
 

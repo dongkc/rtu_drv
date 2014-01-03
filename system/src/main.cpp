@@ -25,6 +25,11 @@
 #include <Poco/DateTime.h>
 #include <Poco/Timer.h>
 #include <Poco/Net/IPAddress.h>
+#include <Poco/AutoPtr.h>
+#include <Poco/FileChannel.h>
+#include <Poco/AsyncChannel.h>
+#include <Poco/FormattingChannel.h>
+#include <Poco/PatternFormatter.h>
 #include <boost/lexical_cast.hpp>
 #include <ctime>
 #include <sys/time.h>
@@ -43,6 +48,12 @@ using Poco::DateTime;
 using Poco::Net::IPAddress;
 using Poco::Timer;
 using Poco::TimerCallback;
+using Poco::AutoPtr;
+using Poco::FileChannel;
+using Poco::AsyncChannel;
+using Poco::Logger;
+using Poco::FormattingChannel;
+using Poco::PatternFormatter;
 
 namespace Zebra {
 
@@ -168,14 +179,30 @@ unsigned char *fnShareMemory()
 		shm_id=shmget(key,0,0);
 	}
 
-    lym_fn_RealTime_10ms();
+    //lym_fn_RealTime_10ms();
     return (unsigned char*)shmat(shm_id,NULL,0);
+}
+
+void log_init()
+{
+    AutoPtr<FileChannel> pChannel(new FileChannel);
+    pChannel->setProperty("path", "/home/consen/rtu.log");
+    pChannel->setProperty("rotation", "2K");
+    pChannel->setProperty("archive", "timestamp");
+
+    AutoPtr<FormattingChannel> pFCFile(new FormattingChannel(new PatternFormatter("%Y-%m-%d %H:%M:%S.%c %N[%P]:%s:%q:%t")));
+    pFCFile->setChannel(pChannel);
+    AutoPtr<AsyncChannel> pAsync(new AsyncChannel(pFCFile));
+    Logger::root().setChannel(pAsync);
 }
 
 extern "C" int main(int argc, const char *argv[])
 {
     unsigned char *raw_shm_ptr = fnShareMemory();
     share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
+    memset(shm_ptr, 0, sizeof(share_memory_area_t));
+
+    log_init();
 
     ConsenComManager consen_mgr("/home/consen/comcfg.dat",
                                 "/home/consen/comtask.dat");
@@ -187,13 +214,13 @@ extern "C" int main(int argc, const char *argv[])
 
 #if 1
     shm_ptr->user.io_config[1].channel_type = 9;
-    //shm_ptr->user.io_config[2].channel_type = 9;
+    shm_ptr->user.io_config[2].channel_type = 9;
     //shm_ptr->user.io_config[3].channel_type = 9;
     //shm_ptr->user.io_config[4].channel_type = 9;
     shm_ptr->user.io_config[5].channel_type = 255;
 
-    shm_ptr->user.output_do[0] = 0xAA;
-    shm_ptr->user.output_do[1] = 0xAA;
+    shm_ptr->user.output_do[0] = 0xFA;
+    shm_ptr->user.output_do[1] = 0xEE;
     shm_ptr->user.output_do[2] = 0xFF;
     shm_ptr->user.output_do[3] = 0xFF;
 #endif

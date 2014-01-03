@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 #include <Poco/Runnable.h>
+#include <Poco/Thread.h>
+#include <Poco/Logger.h>
 #include "modbus.h"
 
 typedef struct {
@@ -37,7 +39,7 @@ typedef struct {
     uint16_t offset;
 } consen_task_cfg_t;
 
-class ConsenThread : public Poco::Runnable
+class ConsenCom : public Poco::Runnable
 {
 public:
     enum {
@@ -51,7 +53,7 @@ public:
         MODBUS_WRITE_MULTIPLE_REGISTERS    = 16
     };
 
-    ConsenThread(const std::vector<consen_task_cfg_t>& task_vec,
+    ConsenCom(const std::vector<consen_task_cfg_t>& task_vec,
                  const std::string& com_path,
                  const consen_com_cfg_t&  com,
                  const uint8_t *modbus_bool,
@@ -77,21 +79,6 @@ private:
     const uint8_t *_modbus_bool_region;
     const uint16_t *_modbus_word_region;
     modbus_t *ctx;
-};
-
-class ConsenCom
-
-{
-public:
-    ConsenCom(const char *device, const consen_com_cfg_t& com_cfg);
-    
-    void addTask(const consen_task_cfg_t& task);
-
-    void poll();
-
-private:
-    std::vector<consen_task_cfg_t*> _task_vec;
-    uint16_t _task_period;
 };
 
 class ConsenComManager
@@ -123,8 +110,11 @@ private:
     std::vector<consen_com_cfg_t>  _com_vec;
     std::vector<consen_task_cfg_t> _task_vec_1;
     std::vector<consen_task_cfg_t> _task_vec_2;
-    ConsenThread *_consen_com_1;
-    ConsenThread *_consen_com_2;
+    ConsenCom *_consen_com_1;
+    ConsenCom *_consen_com_2;
+    Poco::Thread _thread_com1;
+    Poco::Thread _thread_com2;
+    Poco::Logger& _logger;
 };
 #endif
 /****************************************************************************/
