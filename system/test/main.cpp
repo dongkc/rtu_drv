@@ -29,6 +29,34 @@ using namespace boost;
 using Poco::SharedMemory;
 using Poco::DateTime;
 
+namespace {
+
+void assemble_io_status(int address,
+                        int nb,
+                        uint8_t *tab_io_status,
+                        uint8_t *rsp)
+{
+    int offset = address / 8;
+    uint8_t byte = rsp[offset];
+    int shift = address % 8;
+    int i;
+
+    for (i = 0; i < nb; i++) {
+        byte |= tab_io_status[i] << shift;
+        if (shift == 7) {
+            /* Byte is full */
+            rsp[offset++] = byte;
+
+            byte = rsp[offset];
+            shift = 0;
+        } else {
+            shift++;
+        }
+    }
+}
+
+}
+
 namespace Zebra {
 
 void updateTime(share_memory_area_t* shm_ptr)

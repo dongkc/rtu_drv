@@ -200,15 +200,18 @@ extern "C" int main(int argc, const char *argv[])
 {
     unsigned char *raw_shm_ptr = fnShareMemory();
     share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
-    //memset(shm_ptr, 0, sizeof(share_memory_area_t));
 
     log_init();
 
+    shm_ptr->user.modbus_word[0] = 8;
+    shm_ptr->user.modbus_word[1] = 1;
+#if 1
     ConsenComManager consen_mgr("/home/consen/comcfg.dat",
                                 "/home/consen/comtask.dat");
     consen_mgr.init();
     consen_mgr.start(shm_ptr->user.modbus_byte,
                      shm_ptr->user.modbus_word);
+#endif
 
     ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, 'N', 8, 1);
 

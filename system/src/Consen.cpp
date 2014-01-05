@@ -26,6 +26,37 @@ using namespace boost;
 
 namespace {
 
+void assemble_io_status(int address,
+                        int nb,
+                        uint8_t *tab_io_status,
+                        uint8_t *rsp)
+{
+    int offset = address / 8;
+    uint8_t byte = rsp[offset];
+    int shift = address % 8;
+    int i;
+
+    for (i = 0; i < nb; i++) {
+        if (tab_io_status[i] == 1) {
+            byte |= 1 << shift;
+        } else {
+            byte &= ~(1 << shift);
+        }
+
+        if (shift == 7) {
+            /* Byte is full */
+            rsp[offset++] = byte;
+
+            byte = rsp[offset];
+            shift = 0;
+        } else {
+            shift++;
+        }
+    }
+
+    rsp[offset] = byte;
+}
+
 int response_io_status(int address, int nb,
                               uint8_t *tab_io_status,
                               uint8_t *rsp, int offset)
@@ -236,7 +267,7 @@ void ConsenCom::init()
                          _com.data_bit,
                          _com.stop_bit);
     modbus_connect(ctx);
-    //modbus_set_debug(ctx, TRUE);
+    modbus_set_debug(ctx, TRUE);
     modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
 }
 
@@ -258,11 +289,10 @@ void ConsenCom::poll()
                                        task.addr,
                                        task.data_num,
                                        buf);
-                response_io_status(0,
+                assemble_io_status(task.offset,
                                    task.data_num,
                                    buf,
-                                   (uint8_t*)(_modbus_bool_region + task.offset),
-                                   0);
+                                   (uint8_t*)_modbus_bool_region);
                 break;
             case MODBUS_READ_INPUT_REGISTER:
                 modbus_read_input_registers(ctx,

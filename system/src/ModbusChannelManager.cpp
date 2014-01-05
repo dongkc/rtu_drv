@@ -12,6 +12,7 @@
  */
 #define __MODBUSCHANNELMANAGER_SRC__
 #include <stdio.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "ModbusChannelManager.h"
@@ -23,6 +24,37 @@ using namespace Zebra;
 
 
 namespace {
+
+void assemble_io_status(int address,
+                        int nb,
+                        uint8_t *tab_io_status,
+                        uint8_t *rsp)
+{
+    int offset = address / 8;
+    uint8_t byte = rsp[offset];
+    int shift = address % 8;
+    int i;
+
+    for (i = 0; i < nb; i++) {
+        if (tab_io_status[i] == 1) {
+            byte |= 1 << shift;
+        } else {
+            byte &= ~(1 << shift);
+        }
+
+        if (shift == 7) {
+            /* Byte is full */
+            rsp[offset++] = byte;
+
+            byte = rsp[offset];
+            shift = 0;
+        } else {
+            shift++;
+        }
+    }
+
+    rsp[offset] = byte;
+}
 
 int response_io_status(int address, int nb,
                               uint8_t *tab_io_status,
@@ -291,11 +323,10 @@ void ModbusChannelManager::transferReadData()
 {
     for (auto channel : vec) {
         if (channel->_di_sink) {
-            response_io_status(0,
+            assemble_io_status(0,
                                channel->_di_len,
                                channel->_di.data(),
-                               channel->_di_sink,
-                               0);
+                               channel->_di_sink);
         }
 
         if (channel->_ai_sink) {
@@ -330,7 +361,10 @@ void ModbusChannelManager::transferWriteData()
 void ModbusChannelManager::setSlaveId(uint8_t address)
 {
     modbus_set_slave(ctx, address);
-    usleep(5000);
+    struct timespec slptm;
+    slptm.tv_sec = 0;
+    slptm.tv_nsec = 100;
+    nanosleep(&slptm, nullptr);
 }
 
 void ModbusChannelManager::debug()
