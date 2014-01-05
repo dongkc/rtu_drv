@@ -179,7 +179,7 @@ unsigned char *fnShareMemory()
 		shm_id=shmget(key,0,0);
 	}
 
-    //lym_fn_RealTime_10ms();
+    lym_fn_RealTime_10ms();
     return (unsigned char*)shmat(shm_id,NULL,0);
 }
 
@@ -203,19 +203,22 @@ extern "C" int main(int argc, const char *argv[])
 
     log_init();
 
-    shm_ptr->user.modbus_word[0] = 8;
-    shm_ptr->user.modbus_word[1] = 1;
+#if 0
+    shm_ptr->user.modbus_word[0] = 1000;
+    shm_ptr->user.modbus_word[1] = 2000;
+#endif
+
 #if 1
     ConsenComManager consen_mgr("/home/consen/comcfg.dat",
                                 "/home/consen/comtask.dat");
     consen_mgr.init();
-    consen_mgr.start(shm_ptr->user.modbus_byte,
+    consen_mgr.start(shm_ptr->user.modbus_bool,
                      shm_ptr->user.modbus_word);
 #endif
 
     ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, 'N', 8, 1);
 
-#if 1
+#if 0
     shm_ptr->user.io_config[1].channel_type = 9;
     shm_ptr->user.io_config[2].channel_type = 9;
     //shm_ptr->user.io_config[3].channel_type = 9;
@@ -232,7 +235,7 @@ extern "C" int main(int argc, const char *argv[])
 
     system_area_t& system_area = shm_ptr->user.system_area;
 
-#if 1
+#if 0
     system_area.set_ip.ip_section_1 = 192;
     system_area.set_ip.ip_section_2 = 168;
     system_area.set_ip.ip_section_3 = 1;
@@ -252,6 +255,7 @@ extern "C" int main(int argc, const char *argv[])
             system_area.io_update_config = 0;
         }
 
+        system_area.io_update_type = 1;
         switch (system_area.io_update_type) {
             case 1:
                 modbus_mgr.readAll();

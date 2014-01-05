@@ -42,17 +42,23 @@ void assemble_io_status(int address,
     int i;
 
     for (i = 0; i < nb; i++) {
-        byte |= tab_io_status[i] << shift;
+        if (tab_io_status[i] == 1) {
+            byte |= 1 << shift;
+        } else {
+            byte &= ~(1 << shift);
+        }
+
         if (shift == 7) {
             /* Byte is full */
             rsp[offset++] = byte;
-
             byte = rsp[offset];
             shift = 0;
         } else {
             shift++;
         }
     }
+
+    rsp[offset] = byte;
 }
 
 }
@@ -127,17 +133,40 @@ unsigned char *fnShareMemory()
 
 }
 
+void printModbusArea(const share_memory_area_t* shm_ptr)
+{
+    printf("MODBUS BOOL ========== %p offset %d %d\n",
+            (uint8_t*)&shm_ptr->user.modbus_bool,
+            (uint8_t*)&shm_ptr->user.io_config - (uint8_t*)shm_ptr,
+            (uint8_t*)&shm_ptr->user.modbus_bool - (uint8_t*)shm_ptr);
+
+    for (uint8_t i = 0; i < 20; ++i) {
+        printf("%X ", shm_ptr->user.modbus_bool[i]);
+    }
+    printf("\n");
+
+    printf("MODBUS WORD ========== %p offset %d\n",
+            (uint8_t*)&shm_ptr->user.modbus_word,
+            (uint8_t*)&shm_ptr->user.modbus_word - (uint8_t*)shm_ptr);
+
+    for (uint8_t i = 0; i < 20; ++i) {
+        printf("%X ", shm_ptr->user.modbus_word[i]);
+    }
+    printf("\n");
+
+}
+
 extern "C" int main(int argc, const char *argv[])
 {
     unsigned char *raw_shm_ptr = fnShareMemory();
-    //share_memory_area_t* shm_ptr = new (mem.begin()) share_memory_area_t;
     share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
 
 
     printf("size of shm : %d\n", sizeof(shm_ptr->user.system_area));
     while (1) {
 
-        debugTime(shm_ptr);
+        //debugTime(shm_ptr);
+        printModbusArea(shm_ptr);
         usleep(1000* 1000);
     }
 }

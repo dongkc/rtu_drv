@@ -36,10 +36,10 @@ void assemble_io_status(int address,
     int i;
 
     for (i = 0; i < nb; i++) {
-        if (tab_io_status[i] == 1) {
-            byte |= 1 << shift;
-        } else {
+        if (tab_io_status[i] == 0) {
             byte &= ~(1 << shift);
+        } else {
+            byte |= 1 << shift;
         }
 
         if (shift == 7) {

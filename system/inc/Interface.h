@@ -25,7 +25,7 @@ static const uint32_t SHARE_MEMORY_DO_LEN             = 512;
 static const uint32_t SHARE_MEMORY_AO_LEN             = 512 / 2; 
 static const uint32_t SHARE_MEMORY_RESERVED_LEN       = 128 + 1024 + 1024; 
 static const uint32_t SHARE_MEMORY_SYSTEM_LEN         = 2048 / 2; 
-static const uint32_t SHARE_MEMORY_IO_CONFIG_LEN      = 256 / 2; 
+static const uint32_t SHARE_MEMORY_IO_CONFIG_LEN      = 2048 / 2; 
 static const uint32_t SHARE_MEMORY_MODBUS_BYTE_LEN    = 256; 
 static const uint32_t SHARE_MEMORY_MODBUS_WORD_LEN    = 4096 / 2; 
 
@@ -111,7 +111,7 @@ typedef union {
         uint8_t  reserved[SHARE_MEMORY_RESERVED_LEN];
         system_area_t system_area;
         io_config_t io_config[SHARE_MEMORY_IO_CONFIG_LEN];
-        uint8_t  modbus_byte[SHARE_MEMORY_MODBUS_BYTE_LEN];
+        uint8_t  modbus_bool[SHARE_MEMORY_MODBUS_BYTE_LEN];
         uint16_t modbus_word[SHARE_MEMORY_MODBUS_WORD_LEN];
     } user;
 } share_memory_area_t;

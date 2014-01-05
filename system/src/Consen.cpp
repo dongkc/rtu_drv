@@ -37,10 +37,10 @@ void assemble_io_status(int address,
     int i;
 
     for (i = 0; i < nb; i++) {
-        if (tab_io_status[i] == 1) {
-            byte |= 1 << shift;
-        } else {
+        if (tab_io_status[i] == 0) {
             byte &= ~(1 << shift);
+        } else {
+            byte |= 1 << shift;
         }
 
         if (shift == 7) {
@@ -101,8 +101,8 @@ void ConsenComManager::init()
     parseCom();
     parseTask();
 
-    _thread_com1.setOSPriority(90, SCHED_RR);
-    _thread_com2.setOSPriority(90, SCHED_RR);
+    //_thread_com1.setOSPriority(90, SCHED_RR);
+    //_thread_com2.setOSPriority(90, SCHED_RR);
 }
 
 void ConsenComManager::debug()
@@ -267,7 +267,7 @@ void ConsenCom::init()
                          _com.data_bit,
                          _com.stop_bit);
     modbus_connect(ctx);
-    modbus_set_debug(ctx, TRUE);
+    //modbus_set_debug(ctx, TRUE);
     modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
 }
 
@@ -323,7 +323,7 @@ void ConsenCom::run()
 
     while (1) {
         poll();
-        //usleep(_com.period * 1000);
+        usleep(1000);
     }
 }
 
