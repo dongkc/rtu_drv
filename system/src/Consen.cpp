@@ -267,7 +267,7 @@ void ConsenCom::init()
                          _com.data_bit,
                          _com.stop_bit);
     modbus_connect(ctx);
-    //modbus_set_debug(ctx, TRUE);
+    modbus_set_debug(ctx, TRUE);
     modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
 }
 

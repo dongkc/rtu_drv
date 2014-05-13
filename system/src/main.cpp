@@ -14,6 +14,7 @@
 /****************************************************************************/
 /**                             MODULES USED                               **/
 /****************************************************************************/
+#include <memory>
 #include <sched.h>
 #include <unistd.h>
 #include <sys/shm.h>
@@ -199,7 +200,7 @@ void log_init()
 extern "C" int main(int argc, const char *argv[])
 {
     unsigned char *raw_shm_ptr = fnShareMemory();
-    share_memory_area_t* shm_ptr = new (raw_shm_ptr) share_memory_area_t;
+    std::shared_ptr<share_memory_area_t> shm_ptr(new (raw_shm_ptr) share_memory_area_t);
 
     log_init();
 
@@ -231,7 +232,7 @@ extern "C" int main(int argc, const char *argv[])
     shm_ptr->user.output_do[3] = 0xFF;
 #endif
 
-    modbus_mgr.init(shm_ptr);
+    modbus_mgr.init(shm_ptr.get());
 
     system_area_t& system_area = shm_ptr->user.system_area;
 
@@ -251,7 +252,7 @@ extern "C" int main(int argc, const char *argv[])
     while (1) {
 
         if (system_area.io_update_config == 1) {
-            modbus_mgr.reconfig(shm_ptr);
+            modbus_mgr.reconfig(shm_ptr.get());
             system_area.io_update_config = 0;
         }
 

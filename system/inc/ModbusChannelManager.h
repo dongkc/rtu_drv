@@ -13,6 +13,8 @@
 #ifndef __MODBUSCHANNELMANAGER_HEADER__
 #define __MODBUSCHANNELMANAGER_HEADER__
 #include <vector>
+#include <memory>
+
 #include "DataChannel.h"
 #include "modbus.h"
 #include "Interface.h"
@@ -48,7 +50,7 @@ public:
     void reconfig(share_memory_area_t* shm_area);
 
 private:
-    std::vector<Zebra::DataChannel*> vec;
+    std::vector<std::shared_ptr<Zebra::DataChannel>> vec;
     modbus_t* ctx;
 };
 
