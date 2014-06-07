@@ -12,7 +12,8 @@ DataChannel::DataChannel(uint8_t id,
                          uint8_t*  di_sink,
                          uint8_t*  do_sink,
                          uint16_t* ai_sink,
-                         uint16_t* ao_sink)
+                         uint16_t* ao_sink,
+                         uint8_t* spi_sink)
     :_di_len(di_len),
      _do_len(do_len),
      _ai_len(ai_len),
@@ -22,7 +23,8 @@ DataChannel::DataChannel(uint8_t id,
      _ai_sink(ai_sink),
      _ao_sink(ao_sink),
      _slaveID(id),
-     _status(1)
+     _status(1),
+     _spi_sink(spi_sink)
 {
 //
 };

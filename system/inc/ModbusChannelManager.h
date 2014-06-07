@@ -14,6 +14,7 @@
 #define __MODBUSCHANNELMANAGER_HEADER__
 #include <vector>
 #include <memory>
+#include <array>
 
 #include "DataChannel.h"
 #include "modbus.h"
@@ -52,6 +53,9 @@ public:
 private:
     std::vector<std::shared_ptr<Zebra::DataChannel>> vec;
     modbus_t* ctx;
+
+    std::array<uint8_t, 32>   model_conf;
+    std::array<uint8_t, 2046> spi_buf;
 };
 
 }

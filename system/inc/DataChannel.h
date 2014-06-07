@@ -31,7 +31,8 @@ public:
                 uint8_t*  di_sink,
                 uint8_t*  do_sink,
                 uint16_t* ai_sink,
-                uint16_t* ao_sink
+                uint16_t* ao_sink,
+                uint8_t*  spi_sink
                 );
 public:
     std::array<uint8_t,  128>  _di;
@@ -52,6 +53,7 @@ public:
     uint8_t _slaveID;
     uint8_t _status;
 
+    uint16_t* _spi_sink;
 };
 
 }

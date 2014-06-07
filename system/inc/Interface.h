@@ -40,10 +40,10 @@ typedef struct {
 typedef enum {
     MODULE_NOT_PRESENT = 0,
 
-    MODULE_DI_16 = 1,
-    MODULE_DO_16 = 2,
-    MODULE_AI_16 = 3,
-    MODULE_AO_08 = 4,
+    MODULE_DI    = 1,
+    MODULE_DO    = 2,
+    MODULE_AI    = 3,
+    MODULE_AO    = 4,
     MODULE_PI_08 = 5,
     MODULE_DI_32 = 6,
     MODULE_DO_32 = 7,
