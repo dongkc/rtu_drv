@@ -53,7 +53,7 @@ public:
     uint8_t _slaveID;
     uint8_t _status;
 
-    uint16_t* _spi_sink;
+    uint8_t* _spi_sink;
 };
 
 }

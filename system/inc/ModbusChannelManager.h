@@ -16,9 +16,12 @@
 #include <memory>
 #include <array>
 
+#include "BufferedAsyncSerial.h"
 #include "DataChannel.h"
-#include "modbus.h"
 #include "Interface.h"
+
+#define  MODULE_MAX_NUM 32
+#define  SPI_BUF_LEN    2048
 
 namespace Zebra {
 
@@ -26,36 +29,25 @@ class ModbusChannelManager
 
 {
 public:
-    ModbusChannelManager(const char *device,
-                         int baud,
-                         char parity,
-                         int data_bit,
-                         int stop_bit);
+    ModbusChannelManager(const std::string& devname, uint32_t baud, const std::string& spi_name);
 
     ~ModbusChannelManager();
 
     void init(share_memory_area_t* shm_area);
 
-    void readAll();
+    void walk();
 
-    void writeAll();
-
-    void setSlaveId(uint8_t address);
-
-    void transferWriteData();
-
-    void transferReadData();
-
-    void debug();
+    void send_cmd(const std::string& cmd);
 
     void reconfig(share_memory_area_t* shm_area);
 
 private:
-    std::vector<std::shared_ptr<Zebra::DataChannel>> vec;
-    modbus_t* ctx;
+    BufferedAsyncSerial serial_port;
+    int spi_fd;
 
-    std::array<uint8_t, 32>   model_conf;
-    std::array<uint8_t, 2046> spi_buf;
+    std::vector<std::shared_ptr<Zebra::DataChannel>> vec;
+    std::array<uint8_t, MODULE_MAX_NUM> module_conf;
+    std::array<uint8_t, SPI_BUF_LEN>    spi_buf;
 };
 
 }

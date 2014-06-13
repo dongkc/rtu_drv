@@ -14,6 +14,10 @@
 /****************************************************************************/
 /**                             MODULES USED                               **/
 /****************************************************************************/
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
 #include <memory>
 #include <sched.h>
 #include <unistd.h>
@@ -36,10 +40,10 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "Interface.h"
-#include "net_config.h"
 #include "ModbusChannelManager.h"
 #include "lym_RT01.h"
 #include "Consen.h"
+#include "BufferedAsyncSerial.h"
 
 using namespace std;
 using namespace boost;
@@ -146,7 +150,7 @@ void setNetworkParas(system_area_t& system_area)
 
     cout << ip  << " " << mask << " " << gateway<< endl;
     
-#if 1
+#if 0
     setIP("manual", ip, mask, gateway);
 
     vector<string> dns_vec{dns};
@@ -197,7 +201,60 @@ void log_init()
     Logger::root().setChannel(pAsync);
 }
 
+void serial_test()
+{
+
+}
 extern "C" int main(int argc, const char *argv[])
+{
+    int spi_fd = open("/dev/spidev32765.0", O_RDWR);
+    if (spi_fd < 0) {
+        return false;
+    }
+
+    uint8_t mode = SPI_MODE_0;
+    int ret = ioctl(spi_fd, SPI_IOC_WR_MODE, &mode);
+    if (ret == -1) {
+        return false;
+    }
+
+    uint8_t tx[32];
+    for (int i = 0; i < 32; ++i) {
+        tx[i] = i;
+    }
+
+    uint8_t rx[32];
+    for (int i = 0; i < 32; ++i) {
+        rx[i] = 0;
+    }
+	struct spi_ioc_transfer tr[1] = {
+        {
+            (unsigned long)&tx[0],
+            (unsigned long)&rx[0],
+            32,
+            0,
+            0,
+            8,
+        },
+   	};
+
+	ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr);
+
+    printf("TX: ");
+    for (int i = 0; i < 32; ++i) {
+        printf("%x  ", tx[i]);
+    }
+    printf("\n");
+
+    printf("RX: ");
+    for (int i = 0; i < 32; ++i) {
+        printf("%x  ", rx[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+extern "C" int mains(int argc, const char *argv[])
 {
     unsigned char *raw_shm_ptr = fnShareMemory();
     std::shared_ptr<share_memory_area_t> shm_ptr(new (raw_shm_ptr) share_memory_area_t);
@@ -217,7 +274,7 @@ extern "C" int main(int argc, const char *argv[])
                      shm_ptr->user.modbus_word);
 #endif
 
-    ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, 'N', 8, 1);
+    ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, "wwww");
 
 #if 0
     shm_ptr->user.io_config[1].channel_type = 9;
@@ -243,7 +300,6 @@ extern "C" int main(int argc, const char *argv[])
     system_area.set_ip.ip_section_4 = 2;
 
     system_area.io_update_type = 1;
-#endif
 
     TimeUpdater time_updater(system_area, 1000);
     Poco::Thread thread;
@@ -290,8 +346,6 @@ extern "C" int main(int argc, const char *argv[])
         usleep(1000 * (system_area.io_update_period > 0 ? system_area.io_update_period : 2));
     }
 
-    thread.join();
+#endif
 }
-
-
 }  //  namespace Zebra

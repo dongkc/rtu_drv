@@ -14,16 +14,21 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
 
-#include "ModbusChannelManager.h"
 #include "Interface.h"
 #include "DataChannel.h"
+#include "ModbusChannelManager.h"
 
 using namespace std;
 using namespace Zebra;
 
 
 namespace {
+
 enum {
     SPI_MODULE_UNUSED       = 0,
     SPI_MODULE_DI           = 1,
@@ -40,76 +45,21 @@ enum {
     SPI_MODULE_PI_LEN       = 16,
 };
 
-void assemble_io_status(int address,
-                        int nb,
-                        uint8_t *tab_io_status,
-                        uint8_t *rsp)
-{
-    int offset = address / 8;
-    uint8_t byte = rsp[offset];
-    int shift = address % 8;
-    int i;
-
-    for (i = 0; i < nb; i++) {
-        if (tab_io_status[i] == 0) {
-            byte &= ~(1 << shift);
-        } else {
-            byte |= 1 << shift;
-        }
-
-        if (shift == 7) {
-            /* Byte is full */
-            rsp[offset++] = byte;
-
-            byte = rsp[offset];
-            shift = 0;
-        } else {
-            shift++;
-        }
-    }
-
-    rsp[offset] = byte;
-}
-
-int response_io_status(int address, int nb,
-                              uint8_t *tab_io_status,
-                              uint8_t *rsp, int offset)
-{
-    int shift = 0;
-    int byte = 0;
-    int i;
-
-    for (i = address; i < address+nb; i++) {
-        byte |= tab_io_status[i] << shift;
-        if (shift == 7) {
-            /* Byte is full */
-            rsp[offset++] = byte;
-            byte = shift = 0;
-        } else {
-            shift++;
-        }
-    }
-
-    if (shift != 0)
-        rsp[offset++] = byte;
-
-    return offset;
-}
-
 }
 
 namespace Zebra {
-ModbusChannelManager::ModbusChannelManager(const char *device,
-                         int baud,
-                         char parity,
-                         int data_bit,
-                         int stop_bit)
+ModbusChannelManager::ModbusChannelManager(const string& device,
+                                           uint32_t baud,
+                                           const string& spi_name)
+    :serial_port(device, baud)
 {
-    ctx = modbus_new_rtu(device, baud, parity, data_bit, stop_bit);
-    //modbus_set_debug(ctx, TRUE);
-    modbus_connect(ctx);
-    modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
+    spi_fd = open(spi_name.c_str(), O_RDWR);
+    
+    for( int i = 0; i < spi_buf.size(); ++i) {
+        spi_buf[i] = 0;
+    }
 }
+
 void ModbusChannelManager::init(share_memory_area_t* shm_area)
 {
     uint32_t  di_counter = 0;
@@ -212,7 +162,6 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
         }
     }
 
-    // io_status init
     for (uint32_t i = 1; i < SHARE_MEMORY_IO_CONFIG_LEN; ++i) {
         shm_area->user.system_area.modules_health_flag[i -1] = MODULE_NOT_FOUND;
     }
@@ -222,56 +171,14 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
     }
 }
 
-void ModbusChannelManager::readAll()
+void ModbusChannelManager::send_cmd(const string& cmd)
 {
-    for (auto channel : vec) {
-        int rc = 0;
-
-        setSlaveId(channel->_slaveID);
-
-        if (channel->_di_len) {
-            rc = modbus_read_input_bits(ctx, 0, channel->_di_len, channel->_di.data());
-        }
-
-        if (channel->_ai_len) {
-            rc = modbus_read_input_registers(ctx, 0, channel->_ai_len, channel->_ai.data());
-        }
-
-        if (rc == -1) {
-            channel->_status = 0;
-        } else {
-            channel->_status = 1;
-        }
-            
+    if (cmd == "") {
+        serial_port.writeString("");
     }
 }
-
-void ModbusChannelManager::writeAll()
-{
-    for (auto channel : vec) {
-        int rc = 0;
-
-        setSlaveId(channel->_slaveID);
-
-        if (channel->_do_len) {
-            rc = modbus_write_bits(ctx, 0, channel->_do_len, channel->_do.data());
-        }
-
-        if (channel->_ao_len) {
-            rc = modbus_write_registers(ctx, 0, channel->_ao_len, channel->_ao.data());
-        }
-
-        if (rc == -1) {
-            channel->_status = 0;
-        } else {
-            channel->_status = 1;
-        }
-    }
-}
-
 ModbusChannelManager::~ModbusChannelManager()
 {
-    modbus_close(ctx);
 }
 
 void ModbusChannelManager::reconfig(share_memory_area_t* shm_area)
@@ -279,65 +186,6 @@ void ModbusChannelManager::reconfig(share_memory_area_t* shm_area)
     vec.clear();
 
     init(shm_area);
-}
-void ModbusChannelManager::transferReadData()
-{
-    for (auto channel : vec) {
-        if (channel->_di_sink) {
-            assemble_io_status(0,
-                               channel->_di_len,
-                               channel->_di.data(),
-                               channel->_di_sink);
-        }
-
-        if (channel->_ai_sink) {
-            uint16_t* dest_ptr = channel->_ai_sink;
-            for (uint8_t i = 0; i < channel->_ai_len; ++i) {
-                *dest_ptr = channel->_ai[i];
-                dest_ptr++;
-            }
-        }
-    }
-}
-
-void ModbusChannelManager::transferWriteData()
-{
-    for (auto channel : vec) {
-        if (channel->_do_sink) {
-           modbus_set_bits_from_bytes(channel->_do.data(),
-                                      0,
-                                      channel->_do_len,
-                                      channel->_do_sink);
-        }
-
-        if (channel->_ao_sink) {
-            uint16_t* src_ptr = channel->_ao_sink;
-            for (uint8_t i = 0; i < channel->_ao_len; ++i) {
-                channel->_ao[i] = *src_ptr;
-                src_ptr++;
-            }
-        }
-    }
-}
-void ModbusChannelManager::setSlaveId(uint8_t address)
-{
-    modbus_set_slave(ctx, address);
-    struct timespec slptm;
-    slptm.tv_sec = 0;
-    slptm.tv_nsec = 100;
-    nanosleep(&slptm, nullptr);
-}
-
-void ModbusChannelManager::debug()
-{
-    for (auto channel : vec) {
-        printf("-----------------------\n");
-        printf("address: %d\n", channel->_slaveID);
-        printf("     di: %d\n", channel->_di_len);
-        printf("     ai: %d\n", channel->_ai_len);
-        printf("     do: %d\n", channel->_do_len);
-        printf("     ai: %d\n", channel->_ao_len);
-    }
 }
 
 }

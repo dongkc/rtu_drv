@@ -36,4 +36,4 @@ IF (PCRE_LIBRARY)
     TARGET_LINK_LIBRARIES(rtu ${PCRE_LIBRARY})
 ENDIF(PCRE_LIBRARY)
 
-TARGET_LINK_LIBRARIES(rtu qpport qf qep qs modbus pthread netconfig web)
+TARGET_LINK_LIBRARIES(rtu qpport qf qep qs modbus pthread web boost_system)
