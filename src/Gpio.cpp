@@ -1,4 +1,5 @@
 #include <fstream>
+#include <boost/lexical_cast.hpp>
 #include "Gpio.h"
 
 using namespace std;
@@ -27,6 +28,17 @@ bool Gpio::init()
     of << _pin << endl;
     of.close();
 
+    int num = boost::lexical_cast<int>(_pin);
+    if (num < 32) {
+        _sys_pin = "pioA" + _pin;
+    } else if (num < 64) {
+        _sys_pin = "pioB" + boost::lexical_cast<string>(num % 32);
+    } else if (num < 96) {
+        _sys_pin = "pioC" + boost::lexical_cast<string>(num % 32);
+    } else if (num < 128) {
+        _sys_pin = "pioD" + boost::lexical_cast<string>(num % 32);
+    }
+
     setDirection(_direction);
 
     return true;
@@ -34,7 +46,7 @@ bool Gpio::init()
 
 void Gpio::set()
 {
-    string path("/sys/class/gpio/gpio" + _pin + "/value");
+    string path("/sys/class/gpio/" + _sys_pin + "/value");
     ofstream of(path.c_str());
 
     of << "1";
@@ -44,7 +56,7 @@ void Gpio::set()
 
 void Gpio::reset()
 {
-    string path("/sys/class/gpio/gpio" + _pin + "/value");
+    string path("/sys/class/gpio/" + _sys_pin + "/value");
     ofstream of(path.c_str());
 
     of << "0";
@@ -52,9 +64,22 @@ void Gpio::reset()
     of.close();
 }
 
+bool Gpio::read() const
+{
+    string path("/sys/class/gpio/" + _sys_pin + "/value");
+    ifstream f(path.c_str());
+    char data;
+
+    f >> data;
+
+    f.close();
+
+    return data == '1' ? true : false;
+}
+
 void Gpio::setDirection(const Direction& direction)
 {
-    string path("/sys/class/gpio/gpio" + _pin + "/direction");
+    string path("/sys/class/gpio/" + _sys_pin + "/direction");
     ofstream of(path.c_str());
 
     _direction = direction;
