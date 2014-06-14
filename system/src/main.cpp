@@ -1,19 +1,3 @@
-/*
- ******************************* C SOURCE FILE *******************************
- **                                                                         **
- ** main.cpp - 
- **                                                                         **
- ** 11/30/2013 03:58:03 PM                                                  **
- **                                                                         **
- ** Copyright (c) 2010, Kechang Dong                                        **
- ** All rights reserved.                                                    **
- **                                                                         **
- *****************************************************************************
- */
-#define __MAIN_SRC__
-/****************************************************************************/
-/**                             MODULES USED                               **/
-/****************************************************************************/
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -61,7 +45,6 @@ using Poco::FormattingChannel;
 using Poco::PatternFormatter;
 
 namespace Zebra {
-
 
 class TimeUpdater : public Poco::Runnable
 {
@@ -201,10 +184,6 @@ void log_init()
     Logger::root().setChannel(pAsync);
 }
 
-void serial_test()
-{
-
-}
 extern "C" int main(int argc, const char *argv[])
 {
     int spi_fd = open("/dev/spidev32765.0", O_RDWR);
@@ -261,91 +240,11 @@ extern "C" int mains(int argc, const char *argv[])
 
     log_init();
 
-#if 0
-    shm_ptr->user.modbus_word[0] = 1000;
-    shm_ptr->user.modbus_word[1] = 2000;
-#endif
-
-#if 1
-    ConsenComManager consen_mgr("/home/consen/comcfg.dat",
-                                "/home/consen/comtask.dat");
-    consen_mgr.init();
-    consen_mgr.start(shm_ptr->user.modbus_bool,
-                     shm_ptr->user.modbus_word);
-#endif
-
     ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, "wwww");
-
-#if 0
-    shm_ptr->user.io_config[1].channel_type = 9;
-    shm_ptr->user.io_config[2].channel_type = 9;
-    //shm_ptr->user.io_config[3].channel_type = 9;
-    //shm_ptr->user.io_config[4].channel_type = 9;
-    shm_ptr->user.io_config[5].channel_type = 255;
-
-    shm_ptr->user.output_do[0] = 0xFA;
-    shm_ptr->user.output_do[1] = 0xEE;
-    shm_ptr->user.output_do[2] = 0xFF;
-    shm_ptr->user.output_do[3] = 0xFF;
-#endif
 
     modbus_mgr.init(shm_ptr.get());
 
-    system_area_t& system_area = shm_ptr->user.system_area;
-
-#if 0
-    system_area.set_ip.ip_section_1 = 192;
-    system_area.set_ip.ip_section_2 = 168;
-    system_area.set_ip.ip_section_3 = 1;
-    system_area.set_ip.ip_section_4 = 2;
-
-    system_area.io_update_type = 1;
-
-    TimeUpdater time_updater(system_area, 1000);
-    Poco::Thread thread;
-    thread.start(time_updater);
-
-    while (1) {
-
-        if (system_area.io_update_config == 1) {
-            modbus_mgr.reconfig(shm_ptr.get());
-            system_area.io_update_config = 0;
-        }
-
-        system_area.io_update_type = 1;
-        switch (system_area.io_update_type) {
-            case 1:
-                modbus_mgr.readAll();
-                modbus_mgr.transferReadData();
-
-                modbus_mgr.transferWriteData();
-                modbus_mgr.writeAll();
-                break;
-
-            case 2:
-                modbus_mgr.readAll();
-                while (system_area.io_update_read_cmd != 1);
-                modbus_mgr.transferReadData();
-                system_area.io_update_read_cmd = 0;
-
-                while (system_area.io_update_write_cmd != 1);
-                modbus_mgr.transferWriteData();
-                system_area.io_update_write_cmd = 0;
-                modbus_mgr.writeAll();
-                break;
-
-            default:
-                break;
-        }
-
-        if (system_area.set_ip_flag == 1) {
-            setNetworkParas(system_area);
-            system_area.set_ip_flag = 0;
-        }
-
-        usleep(1000 * (system_area.io_update_period > 0 ? system_area.io_update_period : 2));
-    }
-
-#endif
+    return 0;
 }
+
 }  //  namespace Zebra

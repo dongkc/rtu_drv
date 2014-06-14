@@ -18,6 +18,8 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
+#include <Poco/Thread.h>
+#include <Poco/Checksum.h>
 
 #include "Interface.h"
 #include "DataChannel.h"
@@ -25,6 +27,7 @@
 
 using namespace std;
 using namespace Zebra;
+using namespace Poco;
 
 
 namespace {
@@ -54,8 +57,10 @@ ModbusChannelManager::ModbusChannelManager(const string& device,
     :serial_port(device, baud)
 {
     spi_fd = open(spi_name.c_str(), O_RDWR);
+    uint8_t mode = SPI_MODE_0;
+    ioctl(spi_fd, SPI_IOC_WR_MODE, &mode);
     
-    for( int i = 0; i < spi_buf.size(); ++i) {
+    for( uint32_t i = 0; i < spi_buf.size(); ++i) {
         spi_buf[i] = 0;
     }
 }
@@ -171,12 +176,48 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
     }
 }
 
-void ModbusChannelManager::send_cmd(const string& cmd)
+bool ModbusChannelManager::handshake()
 {
-    if (cmd == "") {
-        serial_port.writeString("");
+    string response;
+
+    serial_port.writeString("STOP\r\n");
+    Poco::Thread::sleep(200);
+    response = serial_port.readString();
+    if (response != "STOP_OK\r\n") {
+        return false;
     }
+
+    send_cmd_conf();
+    Poco::Thread::sleep(2000);
+    response = serial_port.readString();
+
+    if (response != "CONF_OK\r\n") {
+        return false;
+    }
+
+    serial_port.writeString("START\r\n");
+    Poco::Thread::sleep(200);
+    response = serial_port.readString();
+    if (response != "START_OK\r\n") {
+        return false;
+    }
+
+    return true;
 }
+
+void ModbusChannelManager::send_cmd_conf()
+{
+    string module;
+    module.assign(module_conf.begin(), module_conf.end());
+    string data("CONF:" + module);
+    Checksum crc32(Checksum::TYPE_CRC32);
+    crc32.update(data);
+    serial_port.write(data.c_str(), data.size());
+    UInt32 crc = crc32.checksum();
+    serial_port.write(reinterpret_cast<const char*>(&crc), sizeof(uint32_t));
+    serial_port.write("\r\n", 2);
+}
+
 ModbusChannelManager::~ModbusChannelManager()
 {
 }

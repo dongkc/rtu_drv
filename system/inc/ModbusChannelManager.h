@@ -37,9 +37,12 @@ public:
 
     void walk();
 
-    void send_cmd(const std::string& cmd);
+    bool handshake();
 
     void reconfig(share_memory_area_t* shm_area);
+
+private:
+    void send_cmd_conf();
 
 private:
     BufferedAsyncSerial serial_port;
