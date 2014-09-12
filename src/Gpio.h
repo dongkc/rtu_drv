@@ -12,7 +12,7 @@
  */
 #ifndef __GPIO_HEADER__
 #define __GPIO_HEADER__
-
+#include <string>
 
 namespace Zebra {
 
@@ -53,6 +53,7 @@ private:
         
 private:
     std::string _pin;
+    std::string _sys_pin;
 	Direction _direction;
 };
 

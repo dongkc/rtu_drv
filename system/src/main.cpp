@@ -28,6 +28,7 @@
 #include "lym_RT01.h"
 #include "Consen.h"
 #include "BufferedAsyncSerial.h"
+#include "Gpio.h"
 
 using namespace std;
 using namespace boost;
@@ -167,7 +168,6 @@ unsigned char *fnShareMemory()
 		shm_id=shmget(key,0,0);
 	}
 
-    lym_fn_RealTime_10ms();
     return (unsigned char*)shmat(shm_id,NULL,0);
 }
 
@@ -186,63 +186,49 @@ void log_init()
 
 extern "C" int main(int argc, const char *argv[])
 {
-    int spi_fd = open("/dev/spidev32765.0", O_RDWR);
-    if (spi_fd < 0) {
-        return false;
-    }
-
-    uint8_t mode = SPI_MODE_0;
-    int ret = ioctl(spi_fd, SPI_IOC_WR_MODE, &mode);
-    if (ret == -1) {
-        return false;
-    }
-
-    uint8_t tx[32];
-    for (int i = 0; i < 32; ++i) {
-        tx[i] = i;
-    }
-
-    uint8_t rx[32];
-    for (int i = 0; i < 32; ++i) {
-        rx[i] = 0;
-    }
-	struct spi_ioc_transfer tr[1] = {
-        {
-            (unsigned long)&tx[0],
-            (unsigned long)&rx[0],
-            32,
-            0,
-            0,
-            8,
-        },
-   	};
-
-	ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr);
-
-    printf("TX: ");
-    for (int i = 0; i < 32; ++i) {
-        printf("%x  ", tx[i]);
-    }
-    printf("\n");
-
-    printf("RX: ");
-    for (int i = 0; i < 32; ++i) {
-        printf("%x  ", rx[i]);
-    }
-    printf("\n");
-
-    return 0;
-}
-extern "C" int mains(int argc, const char *argv[])
-{
     unsigned char *raw_shm_ptr = fnShareMemory();
-    std::shared_ptr<share_memory_area_t> shm_ptr(new (raw_shm_ptr) share_memory_area_t);
+    //std::shared_ptr<share_memory_area_t> shm_ptr(new (raw_shm_ptr) share_memory_area_t);
+    std::shared_ptr<share_memory_area_t> shm_ptr(new share_memory_area_t);
 
     log_init();
 
-    ModbusChannelManager modbus_mgr("/dev/ttyS1", 115200, "wwww");
+    ModbusChannelManager modbus_mgr("/dev/ttyS4", 115200, "/dev/spidev32765.0");
+
+    shm_ptr->user.io_config[0].channel_type = MODULE_DI;
+    for (int i = 0; i < 14; ++i) {
+        shm_ptr->user.input_di[i] = i + 5;
+    }
+
+    shm_ptr->user.io_config[1].channel_type = MODULE_AI;
+    for (int i = 0; i < 16; ++i) {
+        shm_ptr->user.input_ai[i] = 0x4567 + i;
+    }
+
+    shm_ptr->user.io_config[2].channel_type = MODULE_DO;
+    for (int i = 0; i < 3; ++i) {
+        shm_ptr->user.output_do[i] = i + 3;
+    }
+
+    shm_ptr->user.io_config[3].channel_type = MODULE_AO;
+    for (int i = 0; i < 16; ++i) {
+        shm_ptr->user.output_ao[i] = i + 3;
+    }
 
     modbus_mgr.init(shm_ptr.get());
+
+    modbus_mgr.handshake();
+
+    while (1) {
+        modbus_mgr.readAll();
+        modbus_mgr.writeAll();
+        while(!modbus_mgr.data_ready.read());
+
+        modbus_mgr.spi_transfer();
+        Poco::Thread::sleep(1000);
+        while(!modbus_mgr.ack_ready.read());
+        modbus_mgr.spi_checksum();
+        Poco::Thread::sleep(5000);
+    }
 
     return 0;
 }

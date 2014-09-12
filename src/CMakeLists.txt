@@ -4,6 +4,7 @@ INCLUDE_DIRECTORIES(../library/modbus/)
 INCLUDE_DIRECTORIES(../library/qpcpp/include/)
 INCLUDE_DIRECTORIES(../library/qpcpp/ports/posix/gnu)
 INCLUDE_DIRECTORIES(../web/)
+INCLUDE_DIRECTORIES(./)
 
 AUX_SOURCE_DIRECTORY(. RTU_SRC)
 
