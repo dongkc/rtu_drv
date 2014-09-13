@@ -42,7 +42,6 @@ TARGET_LINK_LIBRARIES(rtu_driver modbus pthread rt
     serial
     boost_system
     ${POCO_FOUNDATION_LIBRARY}
-    ${CMAKE_SOURCE_DIR}/system/lib/lym_RT01.o
     ${POCO_NET_LIBRARY})
 
 AUX_SOURCE_DIRECTORY(test TEST_SRC)
