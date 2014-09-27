@@ -20,6 +20,7 @@
 #include <linux/spi/spidev.h>
 #include <Poco/Thread.h>
 #include <Poco/Checksum.h>
+#include <iostream>
 
 #include "Interface.h"
 #include "DataChannel.h"
@@ -160,9 +161,11 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
         shm_area->user.system_area.modules_health_flag[i -1] = MODULE_NOT_FOUND;
     }
 
+#if 0
     for (auto channel : vec) {
         //shm_area->user.system_area.modules_health_flag[channel->_slaveID - 1] = MODULE_OK;
     }
+#endif
 }
 
 UInt32 ModbusChannelManager::spi_transfer()
@@ -191,6 +194,13 @@ UInt32 ModbusChannelManager::spi_transfer()
    	};
 
 	ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr);
+
+#if 0
+    for (uint32_t i = 0; i < 15; ++i) {
+        spi_buf[32 + i] = 0xF0;
+//        printf("%x  ", spi_buf[i]);
+    }
+#endif
 
     printf("TX: ");
     for (uint32_t i = 0; i < spi_transfer_len; ++i) {
@@ -283,17 +293,17 @@ void ModbusChannelManager::readAll()
 
 void ModbusChannelManager::write(Zebra::DataChannel* channel)
 {
-//    printf("SPI len: %d SINK: %p DI: %p\n", channel->_len, channel->_sink, channel->_source);
     if (channel->_type == SPI_MODULE_DO) {
         for (int i = 0; i < 3; ++i) {
-            *(static_cast<uint8_t*>(channel->_source) + i) = *(channel->_sink +i);
-//            printf("do index: %d data: %x\n", i, *(channel->_sink) + i);
+//            *(static_cast<uint8_t*>(channel->_sink) + i) = *(channel->_source+i);
+            *(static_cast<uint8_t*>(channel->_sink) + i) = *(static_cast<uint8_t*>(channel->_source) + i);
         }
     }
 
     if (channel->_type == SPI_MODULE_AO) {
         for (int i = 0; i < 16; ++i) {
-            *(static_cast<uint8_t*>(channel->_source) + i) = *(channel->_sink + i);
+            *(static_cast<uint8_t*>(channel->_sink) + i) = *(static_cast<uint8_t*>(channel->_source) + i);
+            //*(static_cast<uint8_t*>(channel->_source) + i) = *(channel->_sink + i);
 //            printf("ao index: %d data: %x\n", i, *(reinterpret_cast<uint16_t*>(channel->_sink) + i));
         }
     }
@@ -310,15 +320,13 @@ bool ModbusChannelManager::handshake()
 {
     string response;
 
-#if 1
     serial_port.writeString("STOP\r\n");
-    Poco::Thread::sleep(200);
+    Poco::Thread::sleep(1000);
     response = serial_port.readString();
     if (response != "STOP_OK\r\n") {
-        cout << "stop error" << endl;
+        cout << "stop error: " << response << endl;
         return false;
     }
-#endif
 
     send_cmd_conf();
     Poco::Thread::sleep(2000);

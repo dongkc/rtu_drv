@@ -29,6 +29,7 @@
 #include "Consen.h"
 #include "BufferedAsyncSerial.h"
 #include "Gpio.h"
+#include <time.h>
 
 using namespace std;
 using namespace boost;
@@ -108,40 +109,6 @@ private:
     uint32_t _period;
 };
 
-string ipToStr(const ip_struct_t& raw_ip)
-{
-    return lexical_cast<string>((uint16_t)raw_ip.ip_section_1) + "." +
-           lexical_cast<string>((uint16_t)raw_ip.ip_section_2) + "." +
-           lexical_cast<string>((uint16_t)raw_ip.ip_section_3) + "." +
-           lexical_cast<string>((uint16_t)raw_ip.ip_section_4);
-}
-
-void setNetworkParas(system_area_t& system_area)
-{
-    const string ip(ipToStr(system_area.set_ip));
-    const string mask(ipToStr(system_area.set_subnet_mask));
-    const string gateway(ipToStr(system_area.set_gateway));
-    const string dns(ipToStr(system_area.set_dns));
-
-    IPAddress ip_address;
-    if (Poco::Net::IPAddress::tryParse(ip, ip_address) &&
-        Poco::Net::IPAddress::tryParse(mask, ip_address) &&
-        Poco::Net::IPAddress::tryParse(gateway, ip_address) &&
-        Poco::Net::IPAddress::tryParse(dns, ip_address) == false) {
-
-//        return;
-    }
-
-    cout << ip  << " " << mask << " " << gateway<< endl;
-    
-#if 0
-    setIP("manual", ip, mask, gateway);
-
-    vector<string> dns_vec{dns};
-    setDNS(dns_vec);
-#endif
-}
-
 void setRealTime()
 {
     struct sched_param param;
@@ -171,63 +138,78 @@ unsigned char *fnShareMemory()
     return (unsigned char*)shmat(shm_id,NULL,0);
 }
 
-void log_init()
-{
-    AutoPtr<FileChannel> pChannel(new FileChannel);
-    pChannel->setProperty("path", "/home/consen/rtu.log");
-    pChannel->setProperty("rotation", "2K");
-    pChannel->setProperty("archive", "timestamp");
-
-    AutoPtr<FormattingChannel> pFCFile(new FormattingChannel(new PatternFormatter("%Y-%m-%d %H:%M:%S.%c %N[%P]:%s:%q:%t")));
-    pFCFile->setChannel(pChannel);
-    AutoPtr<AsyncChannel> pAsync(new AsyncChannel(pFCFile));
-    Logger::root().setChannel(pAsync);
-}
-
 extern "C" int main(int argc, const char *argv[])
 {
     unsigned char *raw_shm_ptr = fnShareMemory();
-    //std::shared_ptr<share_memory_area_t> shm_ptr(new (raw_shm_ptr) share_memory_area_t);
-    std::shared_ptr<share_memory_area_t> shm_ptr(new share_memory_area_t);
 
-    log_init();
+    std::shared_ptr<share_memory_area_t> shm_ptr(new (raw_shm_ptr) share_memory_area_t);
+
+    for (uint32_t i = 1; i < SHARE_MEMORY_IO_CONFIG_LEN; ++i) {
+        shm_ptr->user.io_config[i - 1].channel_type = MODULE_NOT_PRESENT;
+    }
 
     ModbusChannelManager modbus_mgr("/dev/ttyS4", 115200, "/dev/spidev32765.0");
 
-    shm_ptr->user.io_config[0].channel_type = MODULE_DI;
-    for (int i = 0; i < 14; ++i) {
-        shm_ptr->user.input_di[i] = i + 5;
-    }
-
+#if 1
     shm_ptr->user.io_config[1].channel_type = MODULE_AI;
     for (int i = 0; i < 16; ++i) {
         shm_ptr->user.input_ai[i] = 0x4567 + i;
     }
+#endif
 
+#if 1
+    shm_ptr->user.io_config[0].channel_type = MODULE_DO;
+    shm_ptr->user.io_config[1].channel_type = MODULE_DO;
     shm_ptr->user.io_config[2].channel_type = MODULE_DO;
-    for (int i = 0; i < 3; ++i) {
-        shm_ptr->user.output_do[i] = i + 3;
-    }
+    shm_ptr->user.io_config[3].channel_type = MODULE_DO;
+    shm_ptr->user.io_config[4].channel_type = MODULE_DO;
 
+    for (int i = 0; i < 15; ++i) {
+        shm_ptr->user.output_do[i] = 0xF0;
+    }
+#endif
+
+    shm_ptr->user.io_config[5].channel_type = MODULE_DI;
+#if 0
+    for (int i = 0; i < 3; ++i) {
+        shm_ptr->user.input_di[i] = i + 5;
+    }
+#endif
+
+
+#if 0
     shm_ptr->user.io_config[3].channel_type = MODULE_AO;
     for (int i = 0; i < 16; ++i) {
         shm_ptr->user.output_ao[i] = i + 3;
     }
+#endif
 
     modbus_mgr.init(shm_ptr.get());
 
     modbus_mgr.handshake();
+    struct timespec req = {0, 2000000};
 
     while (1) {
+        for (int i = 0; i < 15; ++i) {
+            shm_ptr->user.output_do[i] = ~shm_ptr->user.output_do[i];
+        }
         modbus_mgr.readAll();
         modbus_mgr.writeAll();
-        while(!modbus_mgr.data_ready.read());
+#if 1
+        while(!modbus_mgr.data_ready.read()){
+            nanosleep(&req, NULL);
+        };
+#endif
 
         modbus_mgr.spi_transfer();
-        Poco::Thread::sleep(1000);
-        while(!modbus_mgr.ack_ready.read());
+        nanosleep(&req, NULL);
+#if 0
+        while(!modbus_mgr.ack_ready.read()) {
+            nanosleep(&req, NULL);
+        }
         modbus_mgr.spi_checksum();
-        Poco::Thread::sleep(5000);
+        nanosleep(&req, NULL);
+#endif
     }
 
     return 0;
