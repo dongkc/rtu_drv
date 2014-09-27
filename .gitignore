@@ -5,3 +5,4 @@ cscope.out
 cscope.po.out
 ../bak/
 ../smartmodule/
+.ycm_extra_conf.pyc
