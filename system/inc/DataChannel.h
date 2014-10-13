@@ -26,13 +26,15 @@ public:
     DataChannel(uint16_t type,
                 uint16_t len,
                 void*  source,
-                uint8_t* sink);
+                uint8_t* sink,
+                uint8_t* status);
 
 public:
     uint16_t _type;
     uint16_t _len;
     void* _source;
     uint8_t* _sink;
+    uint8_t* _status;
 };
 
 }

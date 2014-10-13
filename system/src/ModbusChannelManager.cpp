@@ -47,7 +47,15 @@ enum {
     SPI_MODULE_AI_LEN       = 32,
     SPI_MODULE_AO_LEN       = 16,
     SPI_MODULE_PI_LEN       = 16,
+
+    MODULE_STATUS_OK = 3,
 };
+
+inline void swap_assign(uint8_t* source, uint8_t* sink)
+{
+    *source  = *(sink +1);
+    *(source + 1) = *sink;
+}
 
 }
 
@@ -86,28 +94,28 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
         spi_buf[i] = 0xFF;
     }
     uint8_t* spi_buf_base = &spi_buf[32];
+    uint8_t* spi_buf_base_rx = &spi_buf_rx[32];
     uint32_t spi_counter = 0;
-    printf("SPI BUF: %p\n", &spi_buf[32]);
 
     for (uint32_t i = 1; i < SHARE_MEMORY_IO_CONFIG_LEN; ++i) {
-        uint8_t index = i - 1;
-        if (shm_area->user.io_config[index].channel_type == MODULE_TYPE_DONE) {
+        if (shm_area->user.io_config[i-1].channel_type == MODULE_TYPE_DONE) {
             //TODO
             break;
         }
 
-        if (shm_area->user.io_config[index].channel_type == MODULE_NOT_PRESENT) {
+        if (shm_area->user.io_config[i-1].channel_type == MODULE_NOT_PRESENT) {
             continue;
         } else {
             std::shared_ptr<DataChannel> data_channel;
-            switch(shm_area->user.io_config[index].channel_type) {
+            switch(shm_area->user.io_config[i-1].channel_type) {
                 case MODULE_DI:
                     data_channel.reset(new DataChannel(SPI_MODULE_DI,
                                                    24,
                                                    &shm_area->user.input_di[di_counter],
-                                                   spi_buf_base + spi_counter));
+                                                   spi_buf_base_rx + spi_counter,
+                                                   &spi_buf_rx[i - 1]));
                     vec.push_back(data_channel);
-                    module_conf[index] = SPI_MODULE_DI;
+                    module_conf[i-1] = SPI_MODULE_DI;
 
                     di_counter += 3;
                     spi_counter += 3;
@@ -117,9 +125,10 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
                     data_channel.reset(new DataChannel(SPI_MODULE_AI,
                                                    32,
                                                    &shm_area->user.input_ai[ai_counter],
-                                                   spi_buf_base + spi_counter));
+                                                   spi_buf_base_rx + spi_counter,
+                                                   &spi_buf_rx[i - 1]));
                     vec.push_back(data_channel);
-                    module_conf[index] = SPI_MODULE_AI;
+                    module_conf[i-1] = SPI_MODULE_AI;
 
                     ai_counter += 16;
                     spi_counter += 32;
@@ -129,9 +138,10 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
                     data_channel.reset(new DataChannel(SPI_MODULE_DO,
                                                    24,
                                                    &shm_area->user.output_do[do_counter],
-                                                   spi_buf_base + spi_counter));
+                                                   spi_buf_base + spi_counter,
+                                                   &spi_buf_rx[i - 1]));
                     vec.push_back(data_channel);
-                    module_conf[index] = SPI_MODULE_DO;
+                    module_conf[i-1] = SPI_MODULE_DO;
 
                     do_counter += 3;
                     spi_counter += 3;
@@ -141,16 +151,17 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
                     data_channel.reset(new DataChannel(SPI_MODULE_AO,
                                                    16,
                                                    &shm_area->user.output_ao[ao_counter],
-                                                   spi_buf_base + spi_counter));
+                                                   spi_buf_base + spi_counter,
+                                                   &spi_buf_rx[i - 1]));
                     vec.push_back(data_channel);
-                    module_conf[index] = SPI_MODULE_AO;
+                    module_conf[i-1] = SPI_MODULE_AO;
 
                     ao_counter += 8;
                     spi_counter += 16;
                     break;
 
                 default:
-                    module_conf[index] = SPI_MODULE_UNUSED;
+                    module_conf[i-1] = SPI_MODULE_UNUSED;
                     break;
             }
         }
@@ -169,12 +180,36 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
 #endif
 }
 
+void ModbusChannelManager::debug()
+{
+    printf("TX: ");
+    for (uint32_t i = 0; i < 32; ++i) {
+        printf("%x  ", spi_buf[i]);
+    }
+    printf("| ");
+    for (uint32_t i = 32; i < spi_transfer_len; ++i) {
+        printf("%x  ", spi_buf[i]);
+    }
+    printf("\n");
+
+    cout << "length: " << spi_transfer_len << endl;
+    printf("RX: ");
+    for (uint32_t i = 0; i < 32; ++i) {
+        printf("%x  ", spi_buf_rx[i]);
+    }
+    printf("| ");
+    for (uint32_t i = 32; i < spi_transfer_len; ++i) {
+        printf("%x  ", spi_buf_rx[i]);
+    }
+    printf("\n");
+}
+
 UInt32 ModbusChannelManager::spi_transfer()
 {
     union {
         UInt32 crc32;
         uint8_t crc_array[4];
-    } crc_type;
+    } crc_type, test;
 
     Checksum crc32(Checksum::TYPE_CRC32);
     crc32.update(reinterpret_cast<const char*>(spi_buf.data()), spi_transfer_len - 4);
@@ -183,7 +218,7 @@ UInt32 ModbusChannelManager::spi_transfer()
         spi_buf[spi_transfer_len - 4 + i] = crc_type.crc_array[i];
     }
 
-	struct spi_ioc_transfer tr[1] = {
+    struct spi_ioc_transfer tr[1] = {
         {
             (unsigned long)&spi_buf[0],
             (unsigned long)&spi_buf_rx[0],
@@ -192,25 +227,28 @@ UInt32 ModbusChannelManager::spi_transfer()
             0,
             8,
         },
-   	};
+    };
 
-	ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr);
+    ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr);
 
-#if 0
-    printf("TX: ");
-    for (uint32_t i = 0; i < spi_transfer_len; ++i) {
-        printf("%x  ", spi_buf[i]);
+    //debug();
+    {
+        Checksum crc32(Checksum::TYPE_CRC32);
+        crc32.update(reinterpret_cast<const char*>(spi_buf_rx.data()), spi_transfer_len - 4);
+        test.crc32 = crc32.checksum();
+
+        for (int i = 0; i < 4; ++i) {
+            crc_type.crc_array[i] = spi_buf_rx[spi_transfer_len -1 - i];
+        }
+
+        if (crc_type.crc32 != test.crc32) {
+            printf("\nCHECKSUM FAILED: ");
+            for (int i = 0; i < 4; ++i) {
+                printf("%x ", test.crc_array[i]);
+            }
+            printf("\n");
+        };
     }
-    printf("\n");
-
-    cout << "length: " << spi_transfer_len << endl;
-    printf("RX: ");
-    for (uint32_t i = 0; i < spi_transfer_len; ++i) {
-        printf("%x  ", spi_buf_rx[i]);
-    }
-    printf("\n");
-#endif
-
     return crc_type.crc32;
 }
 
@@ -227,12 +265,12 @@ UInt32 ModbusChannelManager::spi_checksum()
 
     std::array<uint8_t, 4>    tx;
     std::array<uint8_t, 4>    rx;
-    
+
     for (int i = 0; i < 4; ++i) {
         tx[i] = crc_type.crc_array[i];
     }
 
-	struct spi_ioc_transfer tr[1] = {
+    struct spi_ioc_transfer tr[1] = {
         {
             (unsigned long)&tx[0],
             (unsigned long)&rx[0],
@@ -241,10 +279,11 @@ UInt32 ModbusChannelManager::spi_checksum()
             0,
             8,
         },
-   	};
+    };
 
-	ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr);
+    ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr);
 
+#if 0
     printf("TX: ");
     for (uint32_t i = 0; i < 4; ++i) {
         printf("%x  ", tx[i]);
@@ -255,6 +294,7 @@ UInt32 ModbusChannelManager::spi_checksum()
         printf("%x  ", rx[i]);
     }
     printf("\n");
+#endif
 
     for (int i = 0; i < 4; ++i) {
         rx_ack.crc_array[i] = crc_type.crc_array[i];
@@ -264,21 +304,40 @@ UInt32 ModbusChannelManager::spi_checksum()
 
 void ModbusChannelManager::read(Zebra::DataChannel* channel)
 {
-    if (channel->_type == SPI_MODULE_DI) {
-        for (int i = 0; i < 3; ++i) {
-            *(channel->_sink + i) = *(static_cast<uint8_t*>(channel->_source) + i);
+    if (*channel->_status == MODULE_STATUS_OK) {
+        if (channel->_type == SPI_MODULE_DI) {
+            for (int i = 0; i < 3; ++i) {
+                *(static_cast<uint8_t*>(channel->_source) + i) = *(static_cast<uint8_t*>(channel->_sink) + i);
+            }
+        }
+
+        if (channel->_type == SPI_MODULE_AI) {
+            for (int i = 0; i < 32; i += 2) {
+                swap_assign(static_cast<uint8_t*>(channel->_source) + i, static_cast<uint8_t*>(channel->_sink) + i);
+            }
+        }
+    } else {
+    }
+}
+
+void ModbusChannelManager::check()
+{
+    bool status = false;
+    for (int i = 0; i < 24; ++i) {
+        if (spi_buf_rx[i] != MODULE_STATUS_OK) {
+            status = true;
         }
     }
 
-    if (channel->_type == SPI_MODULE_AI) {
-        for (int i = 0; i < 32; ++i) {
-            *(channel->_sink + i) = *(static_cast<uint8_t*>(channel->_source) + i);
-        }
+    if (status) {
+        debug();
     }
 }
 
 void ModbusChannelManager::readAll()
 {
+    //check();
+
     for (auto e : vec) {
         read(e.get());
     }
@@ -286,15 +345,17 @@ void ModbusChannelManager::readAll()
 
 void ModbusChannelManager::write(Zebra::DataChannel* channel)
 {
-    if (channel->_type == SPI_MODULE_DO) {
-        for (int i = 0; i < 3; ++i) {
-            *(static_cast<uint8_t*>(channel->_sink) + i) = *(static_cast<uint8_t*>(channel->_source) + i);
+    if (*channel->_status == MODULE_STATUS_OK) {
+        if (channel->_type == SPI_MODULE_DO) {
+            for (int i = 0; i < 3; ++i) {
+                *(static_cast<uint8_t*>(channel->_sink) + i) = *(static_cast<uint8_t*>(channel->_source) + i);
+            }
         }
-    }
 
-    if (channel->_type == SPI_MODULE_AO) {
-        for (int i = 0; i < 16; ++i) {
-            *(static_cast<uint8_t*>(channel->_sink) + i) = *(static_cast<uint8_t*>(channel->_source) + i);
+        if (channel->_type == SPI_MODULE_AO) {
+            for (int i = 0; i < 16; i += 2) {
+                swap_assign(static_cast<uint8_t*>(channel->_sink) + i, static_cast<uint8_t*>(channel->_source) + i);
+            }
         }
     }
 }
@@ -344,17 +405,19 @@ void ModbusChannelManager::send_cmd_conf()
     module.assign(module_conf.begin(), module_conf.end());
     string data("CONF:" + module);
 
+#if 0
     cout << endl;
     for (uint32_t i = 0; i < data.size(); ++i) {
         printf("%x", data[i]);
     }
     cout << endl;
+#endif
 
     Checksum crc32(Checksum::TYPE_CRC32);
     crc32.update(data);
     serial_port.write(data.c_str(), data.size());
     UInt32 crc = crc32.checksum();
-    printf("CRC: %x\n", crc);
+//    printf("CRC: %x\n", crc);
     serial_port.write(reinterpret_cast<const char*>(&crc), sizeof(uint32_t));
     serial_port.write("\r\n", 2);
 }

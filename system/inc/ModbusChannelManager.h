@@ -56,6 +56,10 @@ private:
 
     void send_cmd_conf();
 
+    void debug();
+
+    void check();
+
 public:
     Zebra::Gpio data_ready;
     Zebra::Gpio ack_ready;

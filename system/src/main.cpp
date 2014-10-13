@@ -131,7 +131,7 @@ unsigned char *fnShareMemory()
 	shm_id=shmget(key,65536,IPC_CREAT|IPC_EXCL|0600);
 	if(shm_id==-1)
 	{
-		printf("shmget error");
+//		printf("shmget error");
 		shm_id=shmget(key,0,0);
 	}
 
@@ -150,37 +150,22 @@ extern "C" int main(int argc, const char *argv[])
 
     ModbusChannelManager modbus_mgr("/dev/ttyS4", 115200, "/dev/spidev32765.0");
 
-#if 1
-    shm_ptr->user.io_config[1].channel_type = MODULE_AI;
-    for (int i = 0; i < 16; ++i) {
-        shm_ptr->user.input_ai[i] = 0x4567 + i;
+    setRealTime();
+
+#if 0
+    for (int i = 0; i < 8; ++i) {
+        shm_ptr->user.io_config[i].channel_type = MODULE_DO;
     }
-#endif
-
-#if 1
-    shm_ptr->user.io_config[0].channel_type = MODULE_DO;
-    shm_ptr->user.io_config[1].channel_type = MODULE_DO;
-    shm_ptr->user.io_config[2].channel_type = MODULE_DO;
-    shm_ptr->user.io_config[3].channel_type = MODULE_DO;
-    shm_ptr->user.io_config[4].channel_type = MODULE_DO;
-
-    for (int i = 0; i < 15; ++i) {
+    for (int i = 0; i < 24; ++i) {
         shm_ptr->user.output_do[i] = 0xF0;
     }
-#endif
 
-    shm_ptr->user.io_config[5].channel_type = MODULE_DI;
-#if 0
-    for (int i = 0; i < 3; ++i) {
-        shm_ptr->user.input_di[i] = i + 5;
+    for (int i = 8; i < 16; ++i) {
+        shm_ptr->user.io_config[i].channel_type = MODULE_DI;
     }
-#endif
 
-
-#if 0
-    shm_ptr->user.io_config[3].channel_type = MODULE_AO;
-    for (int i = 0; i < 16; ++i) {
-        shm_ptr->user.output_ao[i] = i + 3;
+    for (int i = 16; i < 24; ++i) {
+        shm_ptr->user.io_config[i].channel_type = MODULE_AI;
     }
 #endif
 
@@ -188,21 +173,32 @@ extern "C" int main(int argc, const char *argv[])
 
     modbus_mgr.handshake();
     struct timespec req = {0, 2000000};
+    struct timespec req2 = {0, 30000000};
+
+    modbus_mgr.writeAll();
+    while(!modbus_mgr.data_ready.read()){
+        nanosleep(&req, NULL);
+    };
+    modbus_mgr.spi_transfer();
 
     while (1) {
-        for (int i = 0; i < 15; ++i) {
+
+#if 0
+        for (int i = 0; i < 24; ++i) {
             shm_ptr->user.output_do[i] = ~shm_ptr->user.output_do[i];
         }
-        modbus_mgr.readAll();
+#endif
+
         modbus_mgr.writeAll();
-#if 1
+
+        nanosleep(&req2, NULL);
         while(!modbus_mgr.data_ready.read()){
             nanosleep(&req, NULL);
         };
-#endif
 
         modbus_mgr.spi_transfer();
-        nanosleep(&req, NULL);
+
+        modbus_mgr.readAll();
 #if 0
         while(!modbus_mgr.ack_ready.read()) {
             nanosleep(&req, NULL);
