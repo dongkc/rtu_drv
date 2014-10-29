@@ -152,13 +152,13 @@ extern "C" int main(int argc, const char *argv[])
 
     setRealTime();
 
-#if 0
-    for (int i = 0; i < 8; ++i) {
+#if 1
+    for (int i = 2; i < 3; ++i) {
         shm_ptr->user.io_config[i].channel_type = MODULE_DO;
     }
-    for (int i = 0; i < 24; ++i) {
-        shm_ptr->user.output_do[i] = 0xF0;
-    }
+
+    shm_ptr->user.io_config[10].channel_type = MODULE_DI;
+#if 0
 
     for (int i = 8; i < 16; ++i) {
         shm_ptr->user.io_config[i].channel_type = MODULE_DI;
@@ -167,6 +167,11 @@ extern "C" int main(int argc, const char *argv[])
     for (int i = 16; i < 24; ++i) {
         shm_ptr->user.io_config[i].channel_type = MODULE_AI;
     }
+
+    for (int i = 0; i < 24; ++i) {
+        shm_ptr->user.output_do[i] = 0x0F;
+    }
+#endif
 #endif
 
     modbus_mgr.init(shm_ptr.get());
@@ -183,9 +188,9 @@ extern "C" int main(int argc, const char *argv[])
 
     while (1) {
 
-#if 0
+#if 1
         for (int i = 0; i < 24; ++i) {
-            shm_ptr->user.output_do[i] = ~shm_ptr->user.output_do[i];
+            shm_ptr->user.output_do[i] = ~shm_ptr->user.input_di[i];
         }
 #endif
 

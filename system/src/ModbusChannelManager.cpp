@@ -182,7 +182,7 @@ void ModbusChannelManager::init(share_memory_area_t* shm_area)
 
 void ModbusChannelManager::debug()
 {
-    printf("TX: ");
+    printf("\nTX: ");
     for (uint32_t i = 0; i < 32; ++i) {
         printf("%x  ", spi_buf[i]);
     }
@@ -192,7 +192,6 @@ void ModbusChannelManager::debug()
     }
     printf("\n");
 
-    cout << "length: " << spi_transfer_len << endl;
     printf("RX: ");
     for (uint32_t i = 0; i < 32; ++i) {
         printf("%x  ", spi_buf_rx[i]);
@@ -202,6 +201,8 @@ void ModbusChannelManager::debug()
         printf("%x  ", spi_buf_rx[i]);
     }
     printf("\n");
+
+    cout << "length: " << spi_transfer_len << endl;
 }
 
 UInt32 ModbusChannelManager::spi_transfer()
@@ -231,7 +232,7 @@ UInt32 ModbusChannelManager::spi_transfer()
 
     ioctl(spi_fd, SPI_IOC_MESSAGE(1), &tr);
 
-    //debug();
+    debug();
     {
         Checksum crc32(Checksum::TYPE_CRC32);
         crc32.update(reinterpret_cast<const char*>(spi_buf_rx.data()), spi_transfer_len - 4);
@@ -330,7 +331,7 @@ void ModbusChannelManager::check()
     }
 
     if (status) {
-        debug();
+        //debug();
     }
 }
 
